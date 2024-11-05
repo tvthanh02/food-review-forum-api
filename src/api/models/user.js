@@ -5,7 +5,10 @@ const userSchema = new mongoose.Schema(
   {
     email: String,
     password: String,
-    role: USER_ROLE,
+    role: {
+      type: String,
+      enum: USER_ROLE,
+    },
     avatar: String,
     user_name: String,
     social_links: [
@@ -21,4 +24,6 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-module.exports = new mongoose.model('User', userSchema);
+const User = mongoose.model('User', userSchema);
+
+module.exports = User;

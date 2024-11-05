@@ -51,4 +51,4 @@ postSchema.virtual('categories', {
   foreignField: 'postId',
 });
 
-module.exports = new mongoose.model('Post', postSchema);
+module.exports = mongoose.model('Post', postSchema);

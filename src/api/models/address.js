@@ -4,4 +4,4 @@ const addressSchema = new mongoose.Schema({
   province: String,
 });
 
-module.exports = new mongoose.model('Province', addressSchema);
+module.exports = mongoose.model('Province', addressSchema);

@@ -4,4 +4,4 @@ const reportTypeSchema = new mongoose.Schema({
   name: String,
 });
 
-module.exports = new mongoose.model('ReportType', reportTypeSchema);
+module.exports = mongoose.model('ReportType', reportTypeSchema);

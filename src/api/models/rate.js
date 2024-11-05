@@ -17,4 +17,4 @@ const rateSchema = new mongoose.Schema(
   }
 );
 
-module.exports = new mongoose.model('Rate', rateSchema);
+module.exports = mongoose.model('Rate', rateSchema);
