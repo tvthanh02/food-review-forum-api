@@ -1,6 +1,9 @@
-const User = require('../models/user');
-const { compare, hash } = require('../helpers/bcrypt');
-const { generateAccessToken, generateRefreshToken } = require('../helpers/jwt');
+const User = require('../models/user.model');
+const { compare, hash } = require('../helpers/bcrypt.helper');
+const {
+  generateAccessToken,
+  generateRefreshToken,
+} = require('../helpers/jwt.helper');
 
 class AuthController {
   static async login(email, password) {
