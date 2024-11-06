@@ -52,7 +52,7 @@ const { checkLogin, checkAdmin } = require('../middlewares/auth.middleware');
  */
 router.get('/', async (req, res) => {
   const { data, message, error } = await UserController.getAllUsers(req.query);
-  if (error) HttpResponseHandler.InternalServerError(res);
+  if (error) return HttpResponseHandler.InternalServerError(res);
   HttpResponseHandler.Success(res, data, message);
 });
 
@@ -82,10 +82,10 @@ router.get('/', async (req, res) => {
  */
 router.get('/:id', checkLogin, async (req, res) => {
   const { id } = req.params;
-  if (!id) HttpResponseHandler.BadRequest(res);
+  if (!id) return HttpResponseHandler.BadRequest(res);
   const { data, message, error } = await UserController.getDetailUser(id);
-  if (error) HttpResponseHandler.InternalServerError(res);
-  if (!data) HttpResponseHandler.NotFound(res);
+  if (error) return HttpResponseHandler.InternalServerError(res);
+  if (!data) return HttpResponseHandler.NotFound(res);
   HttpResponseHandler.Success(res, data, message);
 });
 
@@ -132,12 +132,12 @@ router.get('/:id', checkLogin, async (req, res) => {
  */
 router.patch('/update/:id', checkLogin, async (req, res) => {
   const { id } = req.params;
-  if (!id) HttpResponseHandler.BadRequest(res);
+  if (!id) return HttpResponseHandler.BadRequest(res);
   const { data, message, error } = await UserController.updateUser(
     id,
     req.body
   );
-  if (error) HttpResponseHandler.InternalServerError(res);
+  if (error) return HttpResponseHandler.InternalServerError(res);
   HttpResponseHandler.Success(res, data, message);
 });
 
@@ -167,9 +167,9 @@ router.patch('/update/:id', checkLogin, async (req, res) => {
  */
 router.delete('/delete/:id', checkAdmin, (req, res) => {
   const { id } = req.params;
-  if (!id) HttpResponseHandler.BadRequest(res);
+  if (!id) return HttpResponseHandler.BadRequest(res);
   const { data, message, error } = UserController.deleteUser(id);
-  if (error) HttpResponseHandler.InternalServerError(res);
+  if (error) return HttpResponseHandler.InternalServerError(res);
   HttpResponseHandler.Success(res, data, message);
 });
 

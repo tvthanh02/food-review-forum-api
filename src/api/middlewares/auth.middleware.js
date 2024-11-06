@@ -8,11 +8,13 @@ const checkLogin = async (req, res, next) => {
 
   if (!accessToken) {
     HttpResponseHandler.Unauthorized(res);
+    return;
   }
 
   const [type, token] = accessToken?.split(' ') ?? [];
   if (type !== 'Bearer') {
     HttpResponseHandler.Unauthorized(res);
+    return;
   }
 
   const isTokenBlacklisted =
@@ -23,6 +25,7 @@ const checkLogin = async (req, res, next) => {
   );
   if (!isValid) {
     HttpResponseHandler.Unauthorized(res);
+    return;
   }
 
   next();
@@ -35,7 +38,6 @@ const checkAdmin = async (req, res, next) => {
 
   if (role !== 'admin') {
     HttpResponseHandler.Forbidden(res);
-    return;
   }
   next();
 };

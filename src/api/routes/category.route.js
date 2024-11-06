@@ -53,7 +53,7 @@ router.get('/', async (req, res) => {
   const { data, message, error } = await CategoryController.getAllCategories(
     req.query
   );
-  if (error) HttpResponseHandler.InternalServerError(res);
+  if (error) return HttpResponseHandler.InternalServerError(res);
   HttpResponseHandler.Success(res, data, message);
 });
 
@@ -79,10 +79,10 @@ router.get('/', async (req, res) => {
  */
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
-  if (!id) HttpResponseHandler.BadRequest(res);
+  if (!id) return HttpResponseHandler.BadRequest(res);
   const { data, message, error } =
     await CategoryController.getDetailCategory(id);
-  if (error) HttpResponseHandler.InternalServerError(res);
+  if (error) return HttpResponseHandler.InternalServerError(res);
   HttpResponseHandler.Success(res, data, message);
 });
 
@@ -121,7 +121,7 @@ router.post('/create', checkBadRequest(['category_name']), async (req, res) => {
   const { data, message, error } = await CategoryController.createCategory(
     req.body
   );
-  if (error) HttpResponseHandler.InternalServerError(res);
+  if (error) return HttpResponseHandler.InternalServerError(res);
   HttpResponseHandler.Success(res, data, message);
 });
 
@@ -158,12 +158,12 @@ router.post('/create', checkBadRequest(['category_name']), async (req, res) => {
  */
 router.patch('/update/:id', checkLogin, async (req, res) => {
   const { id } = req.params;
-  if (!id) HttpResponseHandler.BadRequest(res);
+  if (!id) return HttpResponseHandler.BadRequest(res);
   const { data, message, error } = await CategoryController.updateCategory(
     id,
     req.body
   );
-  if (error) HttpResponseHandler.InternalServerError(res);
+  if (error) return HttpResponseHandler.InternalServerError(res);
   HttpResponseHandler.Success(res, data, message);
 });
 
@@ -193,9 +193,9 @@ router.patch('/update/:id', checkLogin, async (req, res) => {
  */
 router.delete('/delete/:id', checkAdmin, (req, res) => {
   const { id } = req.params;
-  if (!id) HttpResponseHandler.BadRequest(res);
+  if (!id) return HttpResponseHandler.BadRequest(res);
   const { data, message, error } = CategoryController.deleteCategory(id);
-  if (error) HttpResponseHandler.InternalServerError(res);
+  if (error) return HttpResponseHandler.InternalServerError(res);
   HttpResponseHandler.Success(res, data, message);
 });
 

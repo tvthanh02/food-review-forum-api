@@ -3,18 +3,8 @@ const mongoose = require('mongoose');
 const commentSchema = new mongoose.Schema(
   {
     content: String,
-    images: [
-      {
-        _id: mongoose.Types.ObjectId,
-        url: String,
-      },
-    ],
-    videos: [
-      {
-        _id: mongoose.Types.ObjectId,
-        url: String,
-      },
-    ],
+    images: [String],
+    videos: [String],
     post: {
       type: mongoose.Types.ObjectId,
       ref: 'Post',

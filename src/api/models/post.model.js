@@ -5,50 +5,38 @@ const postSchema = new mongoose.Schema(
   {
     position: String,
     food_name: String,
-    user_post: {
+    user_id: {
       type: mongoose.Types.ObjectId,
       ref: 'User',
+      require: true,
     },
     province: {
-      type: mongoose.Types.ObjectId,
-      ref: 'Province',
+      type: String,
     },
-    location_map: {
+    maps: {
       latitude: String,
       longitude: String,
     },
     description: String,
     thumbnail: String,
-    images: [
-      {
-        _id: mongoose.Types.ObjectId,
-        url: String,
-      },
-    ],
-    videos: [
-      {
-        _id: mongoose.Types.ObjectId,
-        url: String,
-      },
-    ],
+    images: [String],
+    videos: [String],
     hashtags: String,
     status: {
       type: String,
       enum: POST_STATUS,
     },
+    categories: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: 'Category',
+        required: true,
+      },
+    ],
   },
   {
-    toJSON: {
-      virtuals: true,
-    },
     timestamps: true,
   }
 );
-
-postSchema.virtual('categories', {
-  ref: 'PostCategory',
-  localField: '_id',
-  foreignField: 'postId',
-});
 
 module.exports = mongoose.model('Post', postSchema);

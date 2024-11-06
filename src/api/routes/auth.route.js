@@ -45,7 +45,7 @@ router.post(
     );
 
     if (error) {
-      HttpResponseHandler.InternalServerError(res, message);
+      return HttpResponseHandler.InternalServerError(res, message);
     }
 
     HttpResponseHandler.Success(res, data);
@@ -88,7 +88,7 @@ router.post(
     );
 
     if (error) {
-      HttpResponseHandler.InternalServerError(res, message);
+      return HttpResponseHandler.InternalServerError(res, message);
     }
 
     HttpResponseHandler.Success(res, data);
@@ -144,7 +144,7 @@ router.post(
       refreshToken
     );
     if (error) {
-      HttpResponseHandler.InternalServerError(res, message);
+      return HttpResponseHandler.InternalServerError(res, message);
     }
 
     res.status(200).json({
@@ -182,7 +182,7 @@ router.get('/profile', checkLogin, async (req, res) => {
   const { authorization: accessToken } = req.headers;
   const { uid } = jwt.verify(accessToken, process.env.SECRET_KEY);
   const { data, message, error } = await UserController.getDetailUser(uid);
-  if (error) HttpResponseHandler.InternalServerError(res);
+  if (error) return HttpResponseHandler.InternalServerError(res);
   HttpResponseHandler.Success(res, data, message);
 });
 

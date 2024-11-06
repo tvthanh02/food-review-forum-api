@@ -7,15 +7,11 @@ const reportSchema = new mongoose.Schema(
       ref: 'ReportType',
     },
     note: String,
-    comment: {
-      type: mongoose.Types.ObjectId,
-      ref: 'Comment',
-    },
-    post: {
+    post_id: {
       type: mongoose.Types.ObjectId,
       ref: 'Post',
     },
-    user: {
+    user_id: {
       type: mongoose.Types.ObjectId,
       ref: 'User',
     },

@@ -13,9 +13,9 @@ const categorySchema = new mongoose.Schema(
   }
 );
 categorySchema.virtual('posts', {
-  ref: 'PostCategory',
+  ref: 'Post',
   localField: '_id',
-  foreignField: 'categoryId',
+  foreignField: 'categories',
 });
 
 module.exports = mongoose.model('Category', categorySchema);
