@@ -1,4 +1,5 @@
 const User = require('../models/user.model');
+const BlacklistToken = require('../models/blacklist-token.model');
 const { compare, hash } = require('../helpers/bcrypt.helper');
 const {
   generateAccessToken,
@@ -60,7 +61,22 @@ class AuthController {
     }
   }
 
-  logout() {}
+  static async logout(accessToken, refreshToken) {
+    try {
+      const result = await BlacklistToken.create({ accessToken, refreshToken });
+      result.save();
+
+      return {
+        data: result,
+      };
+    } catch (error) {
+      return {
+        data: null,
+        message: error.message,
+        error: 1,
+      };
+    }
+  }
 }
 
 module.exports = AuthController;

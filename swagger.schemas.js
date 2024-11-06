@@ -21,4 +21,19 @@
  *           type: string
  *         refreshToken:
  *           type: string
+ *     UserInfo:
+ *       type: object
+ *       properties:
+ *         _id:
+ *           type: string
+ *         email:
+ *           type: string
+ *           format: email
+ *     ResponseRegister:
+ *       type: object
+ *       properties:
+ *         message:
+ *           type: string
+ *         result:
+ *           $ref: '#/components/schemas/UserInfo'
  */

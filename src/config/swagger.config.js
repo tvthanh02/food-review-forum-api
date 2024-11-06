@@ -15,7 +15,7 @@ const options = {
       },
       version: '1.0.11',
     },
-    server: [
+    servers: [
       {
         url: 'http://localhost:8000',
       },
