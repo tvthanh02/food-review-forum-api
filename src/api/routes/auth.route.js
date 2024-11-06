@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const AuthController = require('../controllers/auth.controller');
 const { checkLogin } = require('../middlewares/auth.middleware');
+const { checkBadRequest } = require('../middlewares/common.middleware');
 
 /**
  * @openapi
@@ -28,19 +29,26 @@ const { checkLogin } = require('../middlewares/auth.middleware');
  *       '500':
  *        description: Internal Server Error
  */
-router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
-  const { data, message, error } = await AuthController.login(email, password);
+router.post(
+  '/login',
+  checkBadRequest(['email', 'password']),
+  async (req, res) => {
+    const { email, password } = req.body;
+    const { data, message, error } = await AuthController.login(
+      email,
+      password
+    );
 
-  if (error) {
-    res.status(500).json({
-      message,
-    });
-    res.end();
+    if (error) {
+      res.status(500).json({
+        message,
+      });
+      res.end();
+    }
+
+    res.status(200).json(data);
   }
-
-  res.status(200).json(data);
-});
+);
 
 /**
  * @openapi
@@ -67,22 +75,26 @@ router.post('/login', async (req, res) => {
  *       '500':
  *        description: Internal Server Error
  */
-router.post('/register', async (req, res) => {
-  const { email, password } = req.body;
-  const { data, message, error } = await AuthController.register(
-    email,
-    password
-  );
+router.post(
+  '/register',
+  checkBadRequest(['email', 'password']),
+  async (req, res) => {
+    const { email, password } = req.body;
+    const { data, message, error } = await AuthController.register(
+      email,
+      password
+    );
 
-  if (error) {
-    res.status(500).json({
-      message,
-    });
-    res.end();
+    if (error) {
+      res.status(500).json({
+        message,
+      });
+      res.end();
+    }
+
+    res.status(200).json(data);
   }
-
-  res.status(200).json(data);
-});
+);
 
 /**
  * @openapi
@@ -122,22 +134,27 @@ router.post('/register', async (req, res) => {
  *    security:
  *      - bearerAuth: []
  */
-router.post('/logout', checkLogin, async (req, res) => {
-  const { accessToken, refreshToken } = req.body;
-  const { message, error } = await AuthController.logout(
-    accessToken,
-    refreshToken
-  );
-  if (error) {
-    res.status(500).json({
-      message,
-    });
-    res.end();
-  }
+router.post(
+  '/logout',
+  checkLogin,
+  checkBadRequest(['accessToken', 'refreshToken']),
+  async (req, res) => {
+    const { accessToken, refreshToken } = req.body;
+    const { message, error } = await AuthController.logout(
+      accessToken,
+      refreshToken
+    );
+    if (error) {
+      res.status(500).json({
+        message,
+      });
+      res.end();
+    }
 
-  res.status(200).json({
-    message: 'logged out',
-  });
-});
+    res.status(200).json({
+      message: 'logged out',
+    });
+  }
+);
 
 module.exports = router;

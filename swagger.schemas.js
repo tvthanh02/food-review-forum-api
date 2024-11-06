@@ -29,6 +29,33 @@
  *         email:
  *           type: string
  *           format: email
+ *     Profile:
+ *       type: object
+ *       properties:
+ *         _id:
+ *           type: string
+ *         email:
+ *           type: string
+ *           format: email
+ *         avatar:
+ *           type: string
+ *         user_name:
+ *           type: string
+ *         social_links:
+ *           type: array
+ *           items:
+ *             type: string
+ *         bio:
+ *           type: string
+ *     Meta:
+ *       type: object
+ *       properties:
+ *         total:
+ *           type: number
+ *         currentPage:
+ *           type: number
+ *         totalPages:
+ *           type: number
  *     ResponseRegister:
  *       type: object
  *       properties:

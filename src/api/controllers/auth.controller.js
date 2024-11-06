@@ -20,7 +20,7 @@ class AuthController {
       if (!isValid)
         return { data: null, message: 'Password incorrect!', error: 1 };
 
-      const payload = { uid: currentUser._id };
+      const payload = { uid: currentUser._id, role: currentUser.role };
       const [accessToken, refreshToken] = [
         generateAccessToken(payload),
         generateRefreshToken(payload),
