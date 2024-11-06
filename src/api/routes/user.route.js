@@ -11,6 +11,21 @@ const { checkLogin, checkAdmin } = require('../middlewares/auth.middleware');
  *    tags:
  *      - User
  *    operationId: getAll
+ *    parameters:
+ *      - in: query
+ *        name: page
+ *        schema:
+ *          type: integer
+ *          default: 1
+ *          required: false
+ *        example: 1
+ *      - in: query
+ *        name: limit
+ *        schema:
+ *          type: integer
+ *          default: 20
+ *          required: false
+ *        example: 20
  *    responses:
  *       '200':
  *        description: Success
