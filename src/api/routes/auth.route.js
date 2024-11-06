@@ -3,6 +3,11 @@ const router = express.Router();
 const AuthController = require('../controllers/auth.controller');
 const { checkLogin } = require('../middlewares/auth.middleware');
 const { checkBadRequest } = require('../middlewares/common.middleware');
+const HttpResponseHandler = require('../helpers/http-response-handler.helper');
+const jwt = require('jsonwebtoken');
+require('dotenv').config({ path: '.env.local' });
+const process = require('node:process');
+const UserController = require('../controllers/user.controller');
 
 /**
  * @openapi
@@ -40,13 +45,10 @@ router.post(
     );
 
     if (error) {
-      res.status(500).json({
-        message,
-      });
-      res.end();
+      HttpResponseHandler.InternalServerError(res, message);
     }
 
-    res.status(200).json(data);
+    HttpResponseHandler.Success(res, data);
   }
 );
 
@@ -86,13 +88,10 @@ router.post(
     );
 
     if (error) {
-      res.status(500).json({
-        message,
-      });
-      res.end();
+      HttpResponseHandler.InternalServerError(res, message);
     }
 
-    res.status(200).json(data);
+    HttpResponseHandler.Success(res, data);
   }
 );
 
@@ -145,16 +144,46 @@ router.post(
       refreshToken
     );
     if (error) {
-      res.status(500).json({
-        message,
-      });
-      res.end();
+      HttpResponseHandler.InternalServerError(res, message);
     }
 
     res.status(200).json({
+      data: null,
       message: 'logged out',
     });
   }
 );
+
+/**
+ * @openapi
+ * /api/v1/auth/profile:
+ *  get:
+ *    tags:
+ *      - Auth
+ *    operationId: getProfile
+ *    responses:
+ *       '200':
+ *        description: Success
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *               data:
+ *                  $ref: '#/components/schemas/Profile'
+ *       '400':
+ *        description: Bad Request
+ *       '500':
+ *        description: Internal Server Error
+ *    security:
+ *      - bearerAuth: []
+ */
+router.get('/profile', checkLogin, async (req, res) => {
+  const { authorization: accessToken } = req.headers;
+  const { uid } = jwt.verify(accessToken, process.env.SECRET_KEY);
+  const { data, message, error } = await UserController.getDetailUser(uid);
+  if (error) HttpResponseHandler.InternalServerError(res);
+  HttpResponseHandler.Success(res, data, message);
+});
 
 module.exports = router;

@@ -47,6 +47,27 @@
  *             type: string
  *         bio:
  *           type: string
+ *         created_at:
+ *           type: string
+ *           format: date-time
+ *         updated_at:
+ *           type: string
+ *           format: date-time
+ *     Category:
+ *       type: object
+ *       properties:
+ *         _id:
+ *           type: string
+ *         category_name:
+ *           type: string
+ *         description:
+ *           type: string
+ *         created_at:
+ *           type: string
+ *           format: date-time
+ *         updated_at:
+ *           type: string
+ *           format: date-time
  *     Meta:
  *       type: object
  *       properties:

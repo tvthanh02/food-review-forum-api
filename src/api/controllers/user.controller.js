@@ -19,7 +19,7 @@ class UserController {
           })),
           meta: {
             total: listUsers.length,
-            currentPage: page,
+            currentPage: +page,
             totalPages: Math.ceil(listUsers.length / limit),
           },
         },
@@ -33,7 +33,7 @@ class UserController {
     }
   }
 
-  static async getUserById(userId) {
+  static async getDetailUser(userId) {
     try {
       const user = await User.findById(userId).exec();
       return {

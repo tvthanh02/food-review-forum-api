@@ -4,6 +4,7 @@ class HttpResponseHandler {
       error: 1,
       message,
     });
+    return;
   }
 
   static Unauthorized(res, message = 'Unauthorized') {
@@ -11,6 +12,7 @@ class HttpResponseHandler {
       error: 1,
       message,
     });
+    return;
   }
 
   static Forbidden(res, message = 'Forbidden') {
@@ -18,6 +20,7 @@ class HttpResponseHandler {
       error: 1,
       message,
     });
+    return;
   }
 
   static NotFound(res, message = 'Not Found') {
@@ -25,6 +28,7 @@ class HttpResponseHandler {
       error: 1,
       message,
     });
+    return;
   }
 
   static InternalServerError(res, message = 'Internal Server Error') {
@@ -32,6 +36,7 @@ class HttpResponseHandler {
       error: 1,
       message,
     });
+    return;
   }
 
   static Success(res, data = null, message = 'Success') {
