@@ -84,4 +84,52 @@
  *           type: string
  *         result:
  *           $ref: '#/components/schemas/UserInfo'
+ *     Post:
+ *       type: object
+ *       properties:
+ *         _id:
+ *           type: string
+ *         position:
+ *           type: string
+ *         food_name:
+ *           type: string
+ *         user_id:
+ *           type: string
+ *           format: ObjectId
+ *         province:
+ *           type: string
+ *         maps:
+ *           type: object
+ *           properties:
+ *             latitude:
+ *               type: number
+ *             longitude:
+ *               type: number
+ *         description:
+ *           type: string
+ *         thumbnail:
+ *           type: string
+ *         images:
+ *           type: array
+ *           items:
+ *             type: string
+ *         videos:
+ *           type: array
+ *           items:
+ *             type: string
+ *         hashtags:
+ *           type: string
+ *         status:
+ *           type: string
+ *         categories:
+ *           type: array
+ *           items:
+ *             type: string
+ *             format: ObjectId
+ *         created_at:
+ *           type: string
+ *           format: date-time
+ *         updated_at:
+ *           type: string
+ *           format: date-time
  */

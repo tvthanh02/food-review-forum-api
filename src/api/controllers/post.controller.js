@@ -42,27 +42,13 @@ class PostController {
     }
   }
 
-  static async createPost({ requestBody, requestFiles }) {
-    const files = {};
-
-    if (requestFiles.images)
-      files.images = requestFiles.images.map((file) => file.path);
-
-    if (requestFiles.thumbnail)
-      files.thumbnail = requestFiles.thumbnail[0].path;
-
-    if (requestFiles.videos)
-      files.videos = requestFiles.videos.map((file) => file.path);
-
+  static async createPost(data) {
     try {
       const post = await Post.create({
-        ...requestBody,
-        maps: JSON.parse(requestBody?.maps ?? {}),
-        categories: JSON.parse(requestBody.categories),
+        ...data,
+        maps: JSON.parse(data?.maps ?? {}),
+        categories: JSON.parse(data.categories),
         status: 'pending',
-        thumbnail: files.thumbnail,
-        images: files.images,
-        videos: files.videos,
       });
       await post.save();
       return {
@@ -78,6 +64,9 @@ class PostController {
   }
 
   static async updatePost(postId, data) {
+    if (data?.maps) data.maps = JSON.parse(data.maps ?? {});
+    if (data?.categories) data.categories = JSON.parse(data.categories);
+
     try {
       const post = await Post.findByIdAndUpdate(postId, data, {
         new: true,

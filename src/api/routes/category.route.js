@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const HttpResponseHandler = require('../helpers/http-response-handler.helper');
+const HttpResponseHandler = require('../helpers/response-handler.helper');
 const CategoryController = require('../controllers/category.controller');
 const { checkLogin, checkAdmin } = require('../middlewares/auth.middleware');
 const { checkBadRequest } = require('../middlewares/common.middleware');
@@ -98,6 +98,8 @@ router.get('/:id', async (req, res) => {
  *        application/json:
  *          schema:
  *            type: object
+ *            required:
+ *              - category_name
  *            properties:
  *              category_name:
  *                type: string

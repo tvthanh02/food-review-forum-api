@@ -3,7 +3,7 @@ const router = express.Router();
 const AuthController = require('../controllers/auth.controller');
 const { checkLogin } = require('../middlewares/auth.middleware');
 const { checkBadRequest } = require('../middlewares/common.middleware');
-const HttpResponseHandler = require('../helpers/http-response-handler.helper');
+const HttpResponseHandler = require('../helpers/response-handler.helper');
 const jwt = require('jsonwebtoken');
 require('dotenv').config({ path: '.env.local' });
 const process = require('node:process');

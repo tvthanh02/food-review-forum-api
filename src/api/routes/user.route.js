@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const HttpResponseHandler = require('../helpers/http-response-handler.helper');
+const HttpResponseHandler = require('../helpers/response-handler.helper');
 const UserController = require('../controllers/user.controller');
 const { checkLogin, checkAdmin } = require('../middlewares/auth.middleware');
 
