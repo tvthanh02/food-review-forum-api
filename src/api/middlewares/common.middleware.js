@@ -1,12 +1,17 @@
 const HttpResponseHandler = require('../helpers/response-handler.helper');
 const checkBadRequest = (fieldNames = []) => {
   return (req, res, next) => {
-    if (
-      fieldNames.some((fieldName) => !{ ...req.body, ...req.files }[fieldName])
-    ) {
-      HttpResponseHandler.BadRequest(res, 'Bad Request');
-      return;
+    const missingFields = fieldNames.filter(
+      (fieldName) => !req.body[fieldName]
+    );
+
+    if (missingFields.length > 0) {
+      return HttpResponseHandler.BadRequest(
+        res,
+        `Missing required fields: ${missingFields.join(', ')}`
+      );
     }
+
     next();
   };
 };

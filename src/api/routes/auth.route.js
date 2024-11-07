@@ -4,9 +4,7 @@ const AuthController = require('../controllers/auth.controller');
 const { checkLogin } = require('../middlewares/auth.middleware');
 const { checkBadRequest } = require('../middlewares/common.middleware');
 const HttpResponseHandler = require('../helpers/response-handler.helper');
-const jwt = require('jsonwebtoken');
 require('dotenv').config({ path: '.env.local' });
-const process = require('node:process');
 const UserController = require('../controllers/user.controller');
 
 /**
@@ -179,9 +177,7 @@ router.post(
  *      - bearerAuth: []
  */
 router.get('/profile', checkLogin, async (req, res) => {
-  const { authorization: accessToken } = req.headers;
-  const { uid } = jwt.verify(accessToken, process.env.SECRET_KEY);
-  const { data, message, error } = await UserController.getDetailUser(uid);
+  const { data, message, error } = await UserController.getDetailUser(req.uid);
   if (error) return HttpResponseHandler.InternalServerError(res);
   HttpResponseHandler.Success(res, data, message);
 });

@@ -64,6 +64,10 @@ router.get('/', async (req, res) => {
  *    tags:
  *      - Category
  *    operationId: categoryGetDetail
+ *    parameters:
+ *      - in: path
+ *        name: id
+ *        required: true
  *    responses:
  *       '200':
  *        description: Success
@@ -134,6 +138,10 @@ router.post('/create', checkBadRequest(['category_name']), async (req, res) => {
  *    tags:
  *      - Category
  *    operationId: categoryUpdate
+ *    parameters:
+ *      - in: path
+ *        name: id
+ *        required: true
  *    requestBody:
  *      content:
  *        application/json:
@@ -176,6 +184,10 @@ router.patch('/update/:id', checkLogin, async (req, res) => {
  *    tags:
  *      - Category
  *    operationId: categoryDelete
+ *    parameters:
+ *      - in: path
+ *        name: id
+ *        required: true
  *    responses:
  *       '200':
  *        description: Success

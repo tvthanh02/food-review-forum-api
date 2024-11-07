@@ -132,4 +132,74 @@
  *         updated_at:
  *           type: string
  *           format: date-time
+ *     Rate:
+ *       type: object
+ *       properties:
+ *         _id:
+ *           type: string
+ *         rate:
+ *           type: number
+ *         post_id:
+ *           type: string
+ *           format: ObjectId
+ *         user_id:
+ *           type: string
+ *           format: ObjectId
+ *         created_at:
+ *           type: string
+ *           format: date-time
+ *         updated_at:
+ *           type: string
+ *           format: date-time
+ *     Comment:
+ *       type: object
+ *       properties:
+ *         _id:
+ *           type: string
+ *         content:
+ *           type: string
+ *         images:
+ *           type: array
+ *           items:
+ *             type: string
+ *         videos:
+ *           type: array
+ *           items:
+ *             type: string
+ *         post_id:
+ *           type: string
+ *           format: ObjectId
+ *         user_id:
+ *           type: string
+ *           format: ObjectId
+ *         parent_id:
+ *           type: string
+ *           format: ObjectId
+ *         reply_to_user_id:
+ *           type: string
+ *           format: ObjectId
+ *         user:
+ *           type: object
+ *           properties:
+ *             _id:
+ *               type: string
+ *             user_name:
+ *               type: string
+ *             avatar:
+ *               type: string
+ *         reply_to_user:
+ *           type: object
+ *           properties:
+ *             _id:
+ *               type: string
+ *             user_name:
+ *               type: string
+ *             avatar:
+ *               type: string
+ *         created_at:
+ *           type: string
+ *           format: date-time
+ *         updated_at:
+ *           type: string
+ *           format: date-time
  */

@@ -63,6 +63,10 @@ router.get('/', async (req, res) => {
  *    tags:
  *      - User
  *    operationId: getDetailUser
+ *    parameters:
+ *      - in: path
+ *        name: id
+ *        required: true
  *    responses:
  *       '200':
  *        description: Success
@@ -96,6 +100,10 @@ router.get('/:id', checkLogin, async (req, res) => {
  *    tags:
  *      - User
  *    operationId: update
+ *    parameters:
+ *      - in: path
+ *        name: id
+ *        required: true
  *    requestBody:
  *      content:
  *        application/json:
@@ -147,7 +155,11 @@ router.patch('/update/:id', checkLogin, async (req, res) => {
  *  delete:
  *    tags:
  *      - User
- *    operationId: create
+ *    operationId: delete
+ *    parameters:
+ *      - in: path
+ *        name: id
+ *        required: true
  *    responses:
  *       '200':
  *        description: Success

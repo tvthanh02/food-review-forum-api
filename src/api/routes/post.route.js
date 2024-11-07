@@ -62,6 +62,10 @@ router.get('/', async (req, res) => {
  *    tags:
  *      - Post
  *    operationId: getDetailPost
+ *    parameters:
+ *      - in: path
+ *        name: id
+ *        required: true
  *    responses:
  *       '200':
  *        description: Success
@@ -142,6 +146,10 @@ router.post(
  *    tags:
  *      - Post
  *    operationId: updatePost
+ *    parameters:
+ *      - in: path
+ *        name: id
+ *        required: true
  *    responses:
  *       '200':
  *        description: Success
@@ -171,6 +179,10 @@ router.patch('/update/:id', (req, res) => {
  *    tags:
  *      - Post
  *    operationId: deletePost
+ *    parameters:
+ *      - in: path
+ *        name: id
+ *        required: true
  *    responses:
  *       '200':
  *        description: Success

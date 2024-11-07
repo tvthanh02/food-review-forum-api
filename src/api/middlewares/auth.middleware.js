@@ -7,37 +7,38 @@ const checkLogin = async (req, res, next) => {
   const { authorization: accessToken } = req.headers;
 
   if (!accessToken) {
-    HttpResponseHandler.Unauthorized(res);
-    return;
+    return HttpResponseHandler.Unauthorized(res, 'No token provided');
   }
 
-  const [type, token] = accessToken?.split(' ') ?? [];
+  const [type, token] = accessToken.split(' ');
+
   if (type !== 'Bearer') {
-    HttpResponseHandler.Unauthorized(res);
-    return;
+    return HttpResponseHandler.Unauthorized(res, 'Invalid token type');
   }
 
-  const isTokenBlacklisted =
-    (await BlacklistToken.countDocuments({ accessToken: token })) === 0;
+  try {
+    const { uid } = jwt.verify(token, process.env.SECRET_KEY);
 
-  const isValid = Boolean(
-    jwt.verify(token, process.env.SECRET_KEY) && isTokenBlacklisted
-  );
-  if (!isValid) {
-    HttpResponseHandler.Unauthorized(res);
-    return;
+    const isTokenBlacklisted =
+      (await BlacklistToken.countDocuments({ accessToken: token })) > 0;
+
+    if (isTokenBlacklisted) {
+      return HttpResponseHandler.Unauthorized(res, 'Token is blacklisted');
+    }
+
+    req.uid = uid;
+    next();
+  } catch (error) {
+    return HttpResponseHandler.Unauthorized(res, error.message);
   }
-
-  next();
 };
-
 const checkAdmin = async (req, res, next) => {
   checkLogin(req, res, next);
   const { authorization: accessToken } = req.headers;
   const { role } = jwt.verify(accessToken, process.env.SECRET_KEY);
 
   if (role !== 'admin') {
-    HttpResponseHandler.Forbidden(res);
+    return HttpResponseHandler.Forbidden(res);
   }
   next();
 };
