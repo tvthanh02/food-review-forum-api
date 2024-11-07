@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const reportSchema = new mongoose.Schema(
   {
-    content_report: {
+    report_type_id: {
       type: [mongoose.Types.ObjectId],
       ref: 'ReportType',
     },

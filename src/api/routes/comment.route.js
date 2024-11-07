@@ -78,7 +78,7 @@ router.post(
   checkLogin,
   checkBadRequest(['content']),
   async (req, res) => {
-    const userId = req.uid;
+    const userId = req.payload.uid;
     const { data, message, error } = await CommentController.createComment({
       ...req.body,
       user_id: userId,

@@ -18,4 +18,6 @@ module.exports = {
         </div>
     </div>
   `,
+  PAGE: 1,
+  LIMIT: 20,
 };

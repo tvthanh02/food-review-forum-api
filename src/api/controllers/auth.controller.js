@@ -9,10 +9,8 @@ const {
 class AuthController {
   static async login(email, password) {
     try {
-      const currentUser = await User.findOne(
-        { email: email },
-        '_id email password role'
-      ).exec();
+      const currentUser = await User.findOne({ email }).exec();
+
       if (!currentUser)
         return { data: null, message: 'User not exist', error: 1 };
       const isValid = await compare(password, currentUser.password);
@@ -21,6 +19,7 @@ class AuthController {
         return { data: null, message: 'Password incorrect!', error: 1 };
 
       const payload = { uid: currentUser._id, role: currentUser.role };
+
       const [accessToken, refreshToken] = [
         generateAccessToken(payload),
         generateRefreshToken(payload),
@@ -32,7 +31,6 @@ class AuthController {
         },
       };
     } catch (error) {
-      console.log(error);
       return {
         data: null,
         message: error.message,

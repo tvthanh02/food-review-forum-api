@@ -34,7 +34,7 @@ const { checkBadRequest } = require('../middlewares/common.middleware');
  */
 router.get('/', checkLogin, async (req, res) => {
   const { data, message, error } = await WishlistController.getWishlistByUserId(
-    req.uid
+    req.payload.uid
   );
   if (error) return HttpResponseHandler.InternalServerError(res, message);
   HttpResponseHandler.Success(res, data);
@@ -82,7 +82,7 @@ router.post(
   async (req, res) => {
     const { data, message, error } = await WishlistController.createWishlist({
       ...req.body,
-      user_id: req.uid,
+      user_id: req.payload.uid,
     });
     if (error) return HttpResponseHandler.InternalServerError(res, message);
     HttpResponseHandler.Success(res, data);
@@ -120,7 +120,7 @@ router.post(
 router.delete('/delete/:id', checkLogin, async (req, res) => {
   const { id } = req.params;
   const { data, message, error, hasPermission } =
-    await WishlistController.deleteWishlist(id, req.uid);
+    await WishlistController.deleteWishlist(id, req.payload.uid);
   if (hasPermission) return HttpResponseHandler.Forbidden(res, message);
   if (error) return HttpResponseHandler.InternalServerError(res, message);
   HttpResponseHandler.Success(res, data);
@@ -158,7 +158,7 @@ router.delete('/delete/:id', checkLogin, async (req, res) => {
  */
 router.delete('/clear', checkLogin, async (req, res) => {
   const { data, message, error } = await WishlistController.clearWishlist(
-    req.uid
+    req.payload.uid
   );
   if (error) return HttpResponseHandler.InternalServerError(res, message);
   HttpResponseHandler.Success(res, data);

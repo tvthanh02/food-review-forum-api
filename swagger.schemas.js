@@ -202,4 +202,32 @@
  *         updated_at:
  *           type: string
  *           format: date-time
+ *     ResponseReport:
+ *       type: object
+ *       properties:
+ *         _id:
+ *           type: string
+ *         note:
+ *           type: string
+ *         post:
+ *           $ref: '#/components/schemas/Post'
+ *         user:
+ *           type: object
+ *           properties:
+ *             _id:
+ *               type: string
+ *             user_name:
+ *               type: string
+ *             avatar:
+ *               type: string
+ *         report_content:
+ *           type: array
+ *           items:
+ *             type: string
+ *         created_at:
+ *           type: string
+ *           format: date-time
+ *         updated_at:
+ *           type: string
+ *           format: date-time
  */

@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const HttpResponseHandler = require('../helpers/response-handler.helper');
 const UserController = require('../controllers/user.controller');
-const { checkLogin, checkAdmin } = require('../middlewares/auth.middleware');
+const { checkLogin, isAdmin } = require('../middlewares/auth.middleware');
 
 /**
  * @openapi
@@ -177,7 +177,7 @@ router.patch('/update/:id', checkLogin, async (req, res) => {
  *    security:
  *      - bearerAuth: []
  */
-router.delete('/delete/:id', checkAdmin, (req, res) => {
+router.delete('/delete/:id', checkLogin, isAdmin, (req, res) => {
   const { id } = req.params;
   if (!id) return HttpResponseHandler.BadRequest(res);
   const { data, message, error } = UserController.deleteUser(id);

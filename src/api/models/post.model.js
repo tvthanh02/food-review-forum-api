@@ -24,7 +24,8 @@ const postSchema = new mongoose.Schema(
     hashtags: String,
     status: {
       type: String,
-      enum: POST_STATUS,
+      enum: [...POST_STATUS],
+      default: 'pending',
     },
     categories: [
       {

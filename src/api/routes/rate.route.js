@@ -4,9 +4,7 @@ const RateController = require('../controllers/rate.controller');
 const { checkLogin } = require('../middlewares/auth.middleware');
 const { checkBadRequest } = require('../middlewares/common.middleware');
 const HttpResponseHandler = require('../helpers/response-handler.helper');
-const jwt = require('jsonwebtoken');
 require('dotenv').config({ path: '.env.local' });
-const process = require('node:process');
 
 /**
  * @openapi
@@ -112,11 +110,7 @@ router.post(
   checkBadRequest(['rate', 'post_id']),
   async (req, res) => {
     const { rate, post_id } = req.body;
-    const { authorization: accessToken } = req.headers;
-    const { uid } = jwt.verify(
-      accessToken.split(' ')[1],
-      process.env.SECRET_KEY
-    );
+    const uid = req.payload.uid;
     const { data, message, error } = await RateController.createRate(
       rate,
       post_id,

@@ -177,7 +177,9 @@ router.post(
  *      - bearerAuth: []
  */
 router.get('/profile', checkLogin, async (req, res) => {
-  const { data, message, error } = await UserController.getDetailUser(req.uid);
+  const { data, message, error } = await UserController.getDetailUser(
+    req.payload.uid
+  );
   if (error) return HttpResponseHandler.InternalServerError(res);
   HttpResponseHandler.Success(res, data, message);
 });

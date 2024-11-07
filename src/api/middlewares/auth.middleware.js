@@ -17,7 +17,7 @@ const checkLogin = async (req, res, next) => {
   }
 
   try {
-    const { uid } = jwt.verify(token, process.env.SECRET_KEY);
+    const payload = jwt.verify(token, process.env.SECRET_KEY);
 
     const isTokenBlacklisted =
       (await BlacklistToken.countDocuments({ accessToken: token })) > 0;
@@ -26,42 +26,23 @@ const checkLogin = async (req, res, next) => {
       return HttpResponseHandler.Unauthorized(res, 'Token is blacklisted');
     }
 
-    req.uid = uid;
+    req.payload = payload;
+
     next();
   } catch (error) {
     return HttpResponseHandler.Unauthorized(res, error.message);
   }
 };
-const checkAdmin = async (req, res, next) => {
-  checkLogin(req, res, next);
-  const { authorization: accessToken } = req.headers;
-  const { role } = jwt.verify(accessToken, process.env.SECRET_KEY);
+const isAdmin = async (req, res, next) => {
+  const { role: currentUserRole } = req.payload;
 
-  if (role !== 'admin') {
+  if (currentUserRole !== 'admin') {
     return HttpResponseHandler.Forbidden(res);
   }
   next();
 };
 
-const checkUserIdMatch = async (field) => {
-  return (req, res, next) => {
-    checkLogin(req, res, next);
-    const uid = req.uid;
-
-    if (!req.params[field]) {
-      return HttpResponseHandler.BadRequest(res);
-    }
-
-    if (uid !== req.params[field]) {
-      return HttpResponseHandler.Forbidden(res);
-    }
-
-    next();
-  };
-};
-
 module.exports = {
   checkLogin,
-  checkAdmin,
-  checkUserIdMatch,
+  isAdmin,
 };

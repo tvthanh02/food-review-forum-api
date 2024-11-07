@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const HttpResponseHandler = require('../helpers/response-handler.helper');
 const CategoryController = require('../controllers/category.controller');
-const { checkLogin, checkAdmin } = require('../middlewares/auth.middleware');
+const { checkLogin, isAdmin } = require('../middlewares/auth.middleware');
 const { checkBadRequest } = require('../middlewares/common.middleware');
 
 /**
@@ -205,7 +205,7 @@ router.patch('/update/:id', checkLogin, async (req, res) => {
  *    security:
  *      - bearerAuth: []
  */
-router.delete('/delete/:id', checkAdmin, (req, res) => {
+router.delete('/delete/:id', checkLogin, isAdmin, (req, res) => {
   const { id } = req.params;
   if (!id) return HttpResponseHandler.BadRequest(res);
   const { data, message, error } = CategoryController.deleteCategory(id);

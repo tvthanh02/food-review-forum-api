@@ -7,6 +7,8 @@ const postRouter = require('./post.route');
 const uploadRouter = require('./upload.route');
 const rateRouter = require('./rate.route');
 const commentRouter = require('./comment.route');
+const reportTypeRouter = require('./report-type.route');
+const reportRouter = require('./report.route');
 
 router.use('/auth', authRouter);
 router.use('/user', userRouter);
@@ -15,5 +17,7 @@ router.use('/post', postRouter);
 router.use(uploadRouter);
 router.use('/rate', rateRouter);
 router.use('/comment', commentRouter);
+router.use('/report-type', reportTypeRouter);
+router.use('/report', reportRouter);
 
 module.exports = router;
