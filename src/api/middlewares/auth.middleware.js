@@ -43,7 +43,25 @@ const checkAdmin = async (req, res, next) => {
   next();
 };
 
+const checkUserIdMatch = async (field) => {
+  return (req, res, next) => {
+    checkLogin(req, res, next);
+    const uid = req.uid;
+
+    if (!req.params[field]) {
+      return HttpResponseHandler.BadRequest(res);
+    }
+
+    if (uid !== req.params[field]) {
+      return HttpResponseHandler.Forbidden(res);
+    }
+
+    next();
+  };
+};
+
 module.exports = {
   checkLogin,
   checkAdmin,
+  checkUserIdMatch,
 };

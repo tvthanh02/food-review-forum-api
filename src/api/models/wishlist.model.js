@@ -11,9 +11,13 @@ const wishlistSchema = new mongoose.Schema(
       ref: 'Post',
     },
   },
-  {
-    timestamps: true,
-  }
+  { toJSON: { virtuals: true }, timestamps: true }
 );
+
+wishlistSchema.virtual('post_info', {
+  ref: 'Post',
+  localField: 'post_id',
+  foreignField: '_id',
+});
 
 module.exports = mongoose.model('Wishlist', wishlistSchema);
