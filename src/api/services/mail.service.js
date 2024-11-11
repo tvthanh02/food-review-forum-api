@@ -1,4 +1,4 @@
-require('dotenv').config({ path: '.env.local' });
+require('dotenv').config();
 const process = require('node:process');
 const HOST_MAIL = process.env.HOST_MAIL;
 const { CONFIRM_REGISTER_TEMPLATE_MAIL } = require('../../constants');

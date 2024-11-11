@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-require('dotenv').config({ path: '.env.local' });
+require('dotenv').config();
 const process = require('node:process');
 const BlacklistToken = require('../models/blacklist-token.model');
 const HttpResponseHandler = require('../helpers/response-handler.helper');

@@ -4,7 +4,7 @@ const AuthController = require('../controllers/auth.controller');
 const { checkLogin } = require('../middlewares/auth.middleware');
 const { checkBadRequest } = require('../middlewares/common.middleware');
 const HttpResponseHandler = require('../helpers/response-handler.helper');
-require('dotenv').config({ path: '.env.local' });
+require('dotenv').config();
 const UserController = require('../controllers/user.controller');
 
 /**
