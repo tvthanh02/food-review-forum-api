@@ -1,5 +1,6 @@
 const http = require('http');
 const https = require('https');
+const Buffer = require('buffer').Buffer;
 
 const app = require('./app');
 require('dotenv').config();
@@ -17,8 +18,8 @@ const HTTPS_PORT =
 const httpServer = http.createServer(app);
 const httpsServer = https.createServer(
   {
-    key: process.env.SSL_KEY,
-    cert: process.env.SSL_CERT,
+    key: Buffer.from(process.env.SSL_KEY_BASE64, 'base64').toString('utf-8'),
+    cert: Buffer.from(process.env.SSL_CERT_BASE64, 'base64').toString('utf-8'),
   },
   app
 );
