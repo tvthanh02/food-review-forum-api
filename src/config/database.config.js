@@ -1,4 +1,4 @@
-require('dotenv').config({ path: '.env.local' });
+require('dotenv').config();
 const process = require('node:process');
 const mongoose = require('mongoose');
 

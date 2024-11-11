@@ -1,5 +1,5 @@
 const cloudinary = require('cloudinary').v2;
-require('dotenv').config({ path: '.env.local' });
+require('dotenv').config();
 const process = require('node:process');
 
 cloudinary.config({
