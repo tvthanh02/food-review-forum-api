@@ -19,6 +19,9 @@ const options = {
       {
         url: 'http://localhost:8000',
       },
+      {
+        url: 'https://food-review-forum-api.onrender.com',
+      },
     ],
     components: {
       securitySchemes: {
