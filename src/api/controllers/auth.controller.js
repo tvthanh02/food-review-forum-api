@@ -20,11 +20,11 @@ class AuthController {
 
       const payload = { uid: currentUser._id, role: currentUser.role };
 
+      console.log('🚀 ~ AuthController ~ login ~ payload:', payload);
       const [accessToken, refreshToken] = [
         generateAccessToken(payload),
         generateRefreshToken(payload),
       ];
-
       return {
         data: {
           accessToken,
@@ -32,6 +32,8 @@ class AuthController {
         },
       };
     } catch (error) {
+      console.log('🚀 ~ AuthController ~ login ~ error:', error);
+
       return {
         data: null,
         message: error.message,
