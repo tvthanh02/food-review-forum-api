@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken');
-require('dotenv').config();
-const process = require('node:process');
+const { getPublicKey } = require('../helpers/jwt.helper');
 const BlacklistToken = require('../models/blacklist-token.model');
 const HttpResponseHandler = require('../helpers/response-handler.helper');
 const checkLogin = async (req, res, next) => {
@@ -17,7 +16,9 @@ const checkLogin = async (req, res, next) => {
   }
 
   try {
-    const payload = jwt.verify(token, process.env.SECRET_KEY);
+    const payload = jwt.verify(token, getPublicKey(), {
+      algorithms: ['RS256'],
+    });
 
     const isTokenBlacklisted =
       (await BlacklistToken.countDocuments({ accessToken: token })) > 0;

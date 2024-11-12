@@ -10,6 +10,7 @@ class AuthController {
   static async login(email, password) {
     try {
       const currentUser = await User.findOne({ email }).exec();
+      console.log('🚀 ~ AuthController ~ login ~ currentUser:', currentUser);
 
       if (!currentUser)
         return { data: null, message: 'User not exist', error: 1 };
@@ -20,10 +21,13 @@ class AuthController {
 
       const payload = { uid: currentUser._id, role: currentUser.role };
 
+      console.log('🚀 ~ AuthController ~ login ~ payload:', payload);
       const [accessToken, refreshToken] = [
         generateAccessToken(payload),
         generateRefreshToken(payload),
       ];
+      console.log('🚀 ~ AuthController ~ login ~ refreshToken:', refreshToken);
+      console.log('🚀 ~ AuthController ~ login ~ accessToken:', accessToken);
       return {
         data: {
           accessToken,
@@ -31,6 +35,8 @@ class AuthController {
         },
       };
     } catch (error) {
+      console.log('🚀 ~ AuthController ~ login ~ error:', error);
+
       return {
         data: null,
         message: error.message,
