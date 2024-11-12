@@ -24,6 +24,7 @@ class AuthController {
         generateAccessToken(payload),
         generateRefreshToken(payload),
       ];
+
       return {
         data: {
           accessToken,
