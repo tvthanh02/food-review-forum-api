@@ -123,13 +123,19 @@ router.get('/:id', async (req, res) => {
  *    security:
  *      - bearerAuth: []
  */
-router.post('/create', checkBadRequest(['category_name']), async (req, res) => {
-  const { data, message, error } = await CategoryController.createCategory(
-    req.body
-  );
-  if (error) return HttpResponseHandler.InternalServerError(res);
-  HttpResponseHandler.Success(res, data, message);
-});
+router.post(
+  '/create',
+  checkLogin,
+  isAdmin,
+  checkBadRequest(['category_name']),
+  async (req, res) => {
+    const { data, message, error } = await CategoryController.createCategory(
+      req.body
+    );
+    if (error) return HttpResponseHandler.InternalServerError(res);
+    HttpResponseHandler.Success(res, data, message);
+  }
+);
 
 /**
  * @openapi
@@ -166,7 +172,7 @@ router.post('/create', checkBadRequest(['category_name']), async (req, res) => {
  *    security:
  *      - bearerAuth: []
  */
-router.patch('/update/:id', checkLogin, async (req, res) => {
+router.patch('/update/:id', checkLogin, isAdmin, async (req, res) => {
   const { id } = req.params;
   if (!id) return HttpResponseHandler.BadRequest(res);
   const { data, message, error } = await CategoryController.updateCategory(

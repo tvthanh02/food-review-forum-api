@@ -1,9 +1,11 @@
 const User = require('../models/user.model');
 const BlacklistToken = require('../models/blacklist-token.model');
 const { compare, hash } = require('../helpers/bcrypt.helper');
+const jwt = require('jsonwebtoken');
 const {
   generateAccessToken,
   generateRefreshToken,
+  getPublicKey,
 } = require('../helpers/jwt.helper');
 
 class AuthController {
@@ -20,7 +22,6 @@ class AuthController {
 
       const payload = { uid: currentUser._id, role: currentUser.role };
 
-      console.log('🚀 ~ AuthController ~ login ~ payload:', payload);
       const [accessToken, refreshToken] = [
         generateAccessToken(payload),
         generateRefreshToken(payload),
@@ -32,8 +33,6 @@ class AuthController {
         },
       };
     } catch (error) {
-      console.log('🚀 ~ AuthController ~ login ~ error:', error);
-
       return {
         data: null,
         message: error.message,
@@ -75,6 +74,36 @@ class AuthController {
         data: null,
         message: error.message,
         error: 1,
+      };
+    }
+  }
+
+  static async refresh(refreshToken) {
+    try {
+      const payload = jwt.verify(refreshToken, getPublicKey());
+      if (!payload)
+        return {
+          data: null,
+          error: 1,
+          message: 'Token is not valid!',
+        };
+
+      const newAccessToken = generateAccessToken({
+        uid: payload.uid,
+        role: payload.role,
+      });
+
+      return {
+        data: {
+          accessToken: newAccessToken,
+        },
+        message: 'Refresh new token successfully',
+      };
+    } catch (error) {
+      return {
+        data: null,
+        error: 1,
+        message: error.message,
       };
     }
   }

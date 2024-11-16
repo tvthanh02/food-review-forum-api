@@ -180,8 +180,50 @@ router.get('/profile', checkLogin, async (req, res) => {
   const { data, message, error } = await UserController.getDetailUser(
     req.payload.uid
   );
-  if (error) return HttpResponseHandler.InternalServerError(res);
-  HttpResponseHandler.Success(res, data, message);
+  if (error) return HttpResponseHandler.InternalServerError(res, message);
+  HttpResponseHandler.Success(res, data);
 });
+
+/**
+ * @openapi
+ * /api/v1/auth/refresh-token:
+ *  post:
+ *    tags:
+ *      - Auth
+ *    operationId: refreshToken
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties:
+ *              refreshToken:
+ *                type: string
+ *    responses:
+ *       '200':
+ *        description: Success
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                accessToken:
+ *                  type: string
+ *       '400':
+ *        description: Bad Request
+ *       '500':
+ *        description: Internal Server Error
+ */
+router.post(
+  '/refresh-token',
+  checkBadRequest(['refreshToken']),
+  async (req, res) => {
+    const { refreshToken } = req.body;
+    const { data, message, error } = await AuthController.refresh(refreshToken);
+    if (error) return HttpResponseHandler.InternalServerError(res, message);
+    HttpResponseHandler.Success(res, data, message);
+  }
+);
 
 module.exports = router;

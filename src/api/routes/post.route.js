@@ -164,7 +164,7 @@ router.post(
  *    security:
  *      - bearerAuth: []
  */
-router.patch('/update/:id', (req, res) => {
+router.patch('/update/:id', checkLogin, (req, res) => {
   const { id } = req.params;
   if (!id) return HttpResponseHandler.BadRequest(res);
   const { data, message, error } = PostController.updatePost(id, req.body);
@@ -200,7 +200,7 @@ router.patch('/update/:id', (req, res) => {
  *    security:
  *      - bearerAuth: []
  */
-router.delete('/delete/:id', (req, res) => {
+router.delete('/delete/:id', checkLogin, (req, res) => {
   const { id } = req.params;
   if (!id) return HttpResponseHandler.BadRequest(res);
   const { data, message, error } = PostController.deletePost(id);

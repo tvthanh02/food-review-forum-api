@@ -84,7 +84,7 @@ router.get('/', async (req, res) => {
  *    security:
  *      - bearerAuth: []
  */
-router.get('/:id', checkLogin, async (req, res) => {
+router.get('/:id', async (req, res) => {
   const { id } = req.params;
   if (!id) return HttpResponseHandler.BadRequest(res);
   const { data, message, error } = await UserController.getDetailUser(id);
