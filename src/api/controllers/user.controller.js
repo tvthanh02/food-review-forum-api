@@ -43,6 +43,7 @@ class UserController {
           avatar: user.avatar,
           user_name: user.user_name,
           social_links: user.social_links,
+          role: user.role,
           bio: user.bio,
         },
       };
