@@ -26,6 +26,21 @@ const { checkLogin, isAdmin } = require('../middlewares/auth.middleware');
  *          default: 20
  *          required: false
  *        example: 20
+ *      - in: query
+ *        name: role
+ *        schema:
+ *          type: string
+ *          required: false
+ *      - in: query
+ *        name: name
+ *        schema:
+ *          type: string
+ *          required: false
+ *      - in: query
+ *        name: email
+ *        schema:
+ *          type: string
+ *          required: false
  *    responses:
  *       '200':
  *        description: Success

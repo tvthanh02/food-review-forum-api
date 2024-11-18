@@ -1,9 +1,33 @@
 const User = require('../models/user.model');
 class UserController {
-  static async getAllUsers(queries) {
-    const { page = 1, limit = 20 } = queries;
+  static getSearchQueries(searchFields) {
+    const queries = {};
+    searchFields.forEach((searchField) => {
+      const { fieldName, searchValue } = searchField;
+      if (searchValue)
+        queries[fieldName] = { $regex: searchValue, $options: 'i' };
+    });
+
+    return queries;
+  }
+
+  static async getAllUsers(searchQueries) {
+    const {
+      page = 1,
+      limit = 20,
+      role = '',
+      name = '',
+      email = '',
+    } = searchQueries;
+
+    const queries = this.getSearchQueries([
+      { fieldName: 'role', searchValue: role },
+      { fieldName: 'user_name', searchValue: name },
+      { fieldName: 'email', searchValue: email },
+    ]);
+
     try {
-      const listUsers = await User.find()
+      const listUsers = await User.find(queries)
         .skip((page - 1) * limit)
         .limit(limit)
         .exec();
