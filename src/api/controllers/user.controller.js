@@ -45,6 +45,7 @@ class UserController {
             total: listUsers.length,
             currentPage: +page,
             totalPages: Math.ceil(listUsers.length / limit),
+            limit: +limit,
           },
         },
       };
