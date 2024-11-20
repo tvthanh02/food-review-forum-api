@@ -12,6 +12,25 @@ const HttpResponseHandler = require('../helpers/response-handler.helper');
  *    tags:
  *      - Report Type
  *    operationId: getAllReportTypes
+ *    parameters:
+ *      - in: query
+ *        name: page
+ *        schema:
+ *          type: integer
+ *          default: 1
+ *          required: false
+ *      - in: query
+ *        name: limit
+ *        schema:
+ *          type: integer
+ *          default: 20
+ *          required: false
+ *      - in: query
+ *        name: status
+ *        schema:
+ *          type: string
+ *          enum: ['Active', 'Inactive']
+ *          required: false
  *    responses:
  *       '200':
  *        description: Success
@@ -37,9 +56,8 @@ const HttpResponseHandler = require('../helpers/response-handler.helper');
  *      - bearerAuth: []
  */
 router.get('/', checkLogin, isAdmin, async (req, res) => {
-  const { page, limit } = req.query;
   const { data, message, error } = await ReportTypeController.getAllReportTypes(
-    { page, limit }
+    req.query
   );
   if (error) return HttpResponseHandler.InternalServerError(res, message);
   return HttpResponseHandler.Success(res, data);

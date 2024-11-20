@@ -1,16 +1,6 @@
+const { getSearchQueries } = require('../helpers');
 const User = require('../models/user.model');
 class UserController {
-  static getSearchQueries(searchFields) {
-    const queries = {};
-    searchFields.forEach((searchField) => {
-      const { fieldName, searchValue } = searchField;
-      if (searchValue)
-        queries[fieldName] = { $regex: searchValue, $options: 'i' };
-    });
-
-    return queries;
-  }
-
   static async getAllUsers(searchQueries) {
     const {
       page = 1,
@@ -20,7 +10,7 @@ class UserController {
       email = '',
     } = searchQueries;
 
-    const queries = this.getSearchQueries([
+    const queries = getSearchQueries([
       { fieldName: 'role', searchValue: role },
       { fieldName: 'user_name', searchValue: name },
       { fieldName: 'email', searchValue: email },

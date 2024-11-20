@@ -1,8 +1,8 @@
 module.exports = {
   POST_STATUS: ['pending', 'approved', 'rejected', 'warn'],
   REPORT_STATUS: ['Pending', 'Resolved', 'Closed'],
-  REPORT_TYPE_STATUS: ['active', 'inactive'],
-  CATEGORY_STATUS: ['active', 'inactive'],
+  REPORT_TYPE_STATUS: ['Active', 'Inactive'],
+  CATEGORY_STATUS: ['Active', 'Inactive'],
   SUB_ADMIN_STATUS: ['Active', 'Pending', 'Suspended', 'Rejected'],
   USER_ROLE: ['admin', 'subadmin', 'user'],
   CONFIRM_REGISTER_TEMPLATE_MAIL: `

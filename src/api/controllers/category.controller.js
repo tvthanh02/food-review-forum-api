@@ -1,9 +1,15 @@
+const { getSearchQueries } = require('../helpers');
 const Category = require('../models/category.model');
 class CategoryController {
-  static async getAllCategories(queries) {
-    const { page = 1, limit = 20 } = queries;
+  static async getAllCategories(searchQueries) {
+    const { page = 1, limit = 20, status } = searchQueries;
+
+    const queries = getSearchQueries([
+      { fieldName: 'status', searchValue: status },
+    ]);
+
     try {
-      const categories = await Category.find()
+      const categories = await Category.find(queries)
         .skip((page - 1) * limit)
         .limit(limit)
         .exec();

@@ -4,7 +4,6 @@ const ReportController = require('../controllers/report.controller');
 const { checkLogin, isAdmin } = require('../middlewares/auth.middleware');
 const { checkBadRequest } = require('../middlewares/common.middleware');
 const HttpResponseHandler = require('../helpers/response-handler.helper');
-const { PAGE, LIMIT } = require('../../constants');
 
 /**
  * @openapi
@@ -27,6 +26,12 @@ const { PAGE, LIMIT } = require('../../constants');
  *          type: integer
  *          default: 20
  *          required: false
+ *      - in: query
+ *        name: status
+ *        schema:
+ *          type: string
+ *          enum: ['Pending', 'Resolved', 'Closed']
+ *          required: false
  *    responses:
  *       '200':
  *        description: Success
@@ -47,11 +52,9 @@ const { PAGE, LIMIT } = require('../../constants');
  *      - bearerAuth: []
  */
 router.get('/', checkLogin, isAdmin, async (req, res) => {
-  const { page = PAGE, limit = LIMIT } = req.query;
-  const { data, message, error } = await ReportController.getAllReports({
-    page,
-    limit,
-  });
+  const { data, message, error } = await ReportController.getAllReports(
+    req.query
+  );
   if (error) return HttpResponseHandler.BadRequest(res, message);
   return HttpResponseHandler.Success(res, data);
 });
