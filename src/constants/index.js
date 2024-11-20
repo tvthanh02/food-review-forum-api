@@ -1,5 +1,9 @@
 module.exports = {
   POST_STATUS: ['pending', 'approved', 'rejected', 'warn'],
+  REPORT_STATUS: ['Pending', 'Resolved', 'Closed'],
+  REPORT_TYPE_STATUS: ['active', 'inactive'],
+  CATEGORY_STATUS: ['active', 'inactive'],
+  SUB_ADMIN_STATUS: ['Active', 'Pending', 'Suspended', 'Rejected'],
   USER_ROLE: ['admin', 'subadmin', 'user'],
   CONFIRM_REGISTER_TEMPLATE_MAIL: `
  <div style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: #fff; border-radius: 5px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">

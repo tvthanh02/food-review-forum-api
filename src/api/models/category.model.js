@@ -1,9 +1,15 @@
 const mongoose = require('mongoose');
+const { CATEGORY_STATUS } = require('../../constants');
 
 const categorySchema = new mongoose.Schema(
   {
     category_name: String,
     description: String,
+    status: {
+      type: String,
+      enum: [...CATEGORY_STATUS],
+      default: 'active',
+    },
   },
   {
     toJSON: {

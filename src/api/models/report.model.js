@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { REPORT_STATUS } = require('../../constants');
 
 const reportSchema = new mongoose.Schema(
   {
@@ -14,6 +15,11 @@ const reportSchema = new mongoose.Schema(
     user_id: {
       type: mongoose.Types.ObjectId,
       ref: 'User',
+    },
+    status: {
+      type: String,
+      enum: [...REPORT_STATUS],
+      default: 'Pending',
     },
   },
   {

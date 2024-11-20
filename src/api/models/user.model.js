@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { USER_ROLE } = require('../../constants');
+const { USER_ROLE, SUB_ADMIN_STATUS } = require('../../constants');
 
 const userSchema = new mongoose.Schema(
   {
@@ -19,6 +19,10 @@ const userSchema = new mongoose.Schema(
       },
     ],
     bio: String,
+    sub_admin_status: {
+      type: String,
+      enum: [...SUB_ADMIN_STATUS],
+    },
   },
   {
     timestamps: true,
