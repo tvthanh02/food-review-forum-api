@@ -27,6 +27,12 @@ const { PAGE, LIMIT } = require('../../constants');
  *          type: integer
  *          default: 20
  *          required: false
+ *      - in: query
+ *        name: status
+ *        schema:
+ *          type: string
+ *          enum: ['Pending', 'Resolved', 'Closed']
+ *          required: false
  *    responses:
  *       '200':
  *        description: Success

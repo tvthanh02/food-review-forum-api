@@ -1,10 +1,16 @@
 const { PAGE, LIMIT } = require('../../constants');
+const { getSearchQueries } = require('../helpers');
 const ReportType = require('../models/report-type.model');
 class ReportTypeController {
-  static async getAllReportTypes(queries) {
-    const { page = PAGE, limit = LIMIT } = queries;
+  static async getAllReportTypes(searchQueries) {
+    const { page = PAGE, limit = LIMIT, status } = searchQueries;
+
+    const queries = getSearchQueries([
+      { fieldName: 'status', searchValue: status },
+    ]);
+
     try {
-      const reportTypes = await ReportType.find()
+      const reportTypes = await ReportType.find(queries)
         .skip((page - 1) * limit)
         .limit(limit)
         .exec();

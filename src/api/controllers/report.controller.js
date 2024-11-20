@@ -1,10 +1,16 @@
 const { PAGE, LIMIT } = require('../../constants');
+const { getSearchQueries } = require('../helpers');
 const Report = require('../models/report.model');
 class ReportController {
-  static async getAllReports(queries) {
-    const { page = PAGE, limit = LIMIT } = queries;
+  static async getAllReports(searchQueries) {
+    const { page = PAGE, limit = LIMIT, status } = searchQueries;
+
+    const queries = getSearchQueries([
+      { fieldName: 'status', searchValue: status },
+    ]);
+
     try {
-      const reports = await Report.find()
+      const reports = await Report.find(queries)
         .populate('user_id', 'user_name avatar')
         .populate('post_id')
         .populate('report_type_id', 'name')
