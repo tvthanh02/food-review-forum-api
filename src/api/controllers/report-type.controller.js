@@ -32,6 +32,20 @@ class ReportTypeController {
       };
     }
   }
+  static async getReportTypeDetail(id) {
+    try {
+      const reportType = await ReportType.findById(id).exec();
+      return {
+        data: reportType,
+      };
+    } catch (error) {
+      return {
+        data: null,
+        message: error.message,
+        error: 1,
+      };
+    }
+  }
   static async createReportType({ name, status }) {
     try {
       const reportType = await ReportType.create({

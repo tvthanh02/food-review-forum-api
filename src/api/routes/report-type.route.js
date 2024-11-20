@@ -52,16 +52,57 @@ const HttpResponseHandler = require('../helpers/response-handler.helper');
  *        description: Forbidden
  *       '500':
  *        description: Internal Server Error
- *    security:
- *      - bearerAuth: []
  */
-router.get('/', checkLogin, isAdmin, async (req, res) => {
+router.get('/', async (req, res) => {
   const { data, message, error } = await ReportTypeController.getAllReportTypes(
     req.query
   );
   if (error) return HttpResponseHandler.InternalServerError(res, message);
   return HttpResponseHandler.Success(res, data);
 });
+
+/**
+ * @openapi
+ * /api/v1/report-type/{id}:
+ *  get:
+ *    tags:
+ *      - Report Type
+ *    operationId: getReportTypeDetail
+ *    parameters:
+ *      - in: path
+ *        name: id
+ *        required: true
+ *    responses:
+ *       '200':
+ *        description: Success
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                data:
+ *                  type: object
+ *                  properties:
+ *                    _id:
+ *                      type: string
+ *                    name:
+ *                      type: string
+ *                    status:
+ *                      type: string
+ *       '400':
+ *        description: Bad Request
+ *       '500':
+ *        description: Internal Server Error
+ */
+router.get('/:id', async (req, res) => {
+  const { id } = req.params;
+  if (!id) return HttpResponseHandler.BadRequest(res);
+  const { data, message, error } =
+    await ReportTypeController.getReportTypeDetail(id);
+  if (error) return HttpResponseHandler.InternalServerError(res, message);
+  return HttpResponseHandler.Success(res, data);
+});
+
 /**
  * @openapi
  * /api/v1/report-type/create:
