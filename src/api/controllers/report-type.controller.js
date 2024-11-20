@@ -32,10 +32,11 @@ class ReportTypeController {
       };
     }
   }
-  static async createReportType(name) {
+  static async createReportType({ name, status }) {
     try {
       const reportType = await ReportType.create({
         name,
+        status,
       });
       await reportType.save();
       return {
@@ -66,13 +67,17 @@ class ReportTypeController {
     }
   }
 
-  static async updateReportType(reportTypeId, updateName) {
+  static async updateReportType(reportTypeId, updateData) {
+    const updateObject = Object.fromEntries(
+      Object.entries(updateData).filter(
+        // eslint-disable-next-line no-unused-vars
+        ([_, value]) => value !== undefined && value !== null
+      )
+    );
     try {
       const reportType = await ReportType.findByIdAndUpdate(
         reportTypeId,
-        {
-          name: updateName,
-        },
+        updateObject,
         {
           new: true,
           runValidators: true,

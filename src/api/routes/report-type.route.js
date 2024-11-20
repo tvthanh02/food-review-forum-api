@@ -108,10 +108,15 @@ router.post(
   '/create',
   checkLogin,
   isAdmin,
-  checkBadRequest(['name']),
+  checkBadRequest(['name', 'status']),
   async (req, res) => {
+    if (['Active', 'Inactive'].indexOf(req.body.status) === -1)
+      return HttpResponseHandler.BadRequest(
+        res,
+        "Status must be 'Active' or 'Inactive'"
+      );
     const { data, message, error } =
-      await ReportTypeController.createReportType(req.body.name);
+      await ReportTypeController.createReportType(req.body);
     if (error) return HttpResponseHandler.InternalServerError(res, message);
     return HttpResponseHandler.Success(res, data);
   }
@@ -163,20 +168,18 @@ router.post(
  *    security:
  *      - bearerAuth: []
  */
-router.patch(
-  '/update/:id',
-  checkLogin,
-  isAdmin,
-  checkBadRequest(['name']),
-  async (req, res) => {
-    const { id } = req.params;
-    if (!id) return HttpResponseHandler.BadRequest(res);
-    const { data, message, error } =
-      await ReportTypeController.updateReportType(id, req.body.name);
-    if (error) return HttpResponseHandler.InternalServerError(res, message);
-    return HttpResponseHandler.Success(res, data);
-  }
-);
+router.patch('/update/:id', checkLogin, isAdmin, async (req, res) => {
+  if (Object.keys(req.body).length === 0)
+    return HttpResponseHandler.BadRequest(res);
+  const { id } = req.params;
+  if (!id) return HttpResponseHandler.BadRequest(res);
+  const { data, message, error } = await ReportTypeController.updateReportType(
+    id,
+    req.body
+  );
+  if (error) return HttpResponseHandler.InternalServerError(res, message);
+  return HttpResponseHandler.Success(res, data);
+});
 
 /**
  * @openapi
