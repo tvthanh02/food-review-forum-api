@@ -21,6 +21,12 @@ const { checkBadRequest } = require('../middlewares/common.middleware');
  *            schema:
  *              type: object
  *              properties:
+ *                message:
+ *                  type: string
+ *                  example: get wishlist successfully
+ *                status:
+ *                  type: string
+ *                  example: success
  *                data:
  *                  type: array
  *                  items:
@@ -33,11 +39,11 @@ const { checkBadRequest } = require('../middlewares/common.middleware');
  *      - bearerAuth: []
  */
 router.get('/', checkLogin, async (req, res) => {
-  const { data, message, error } = await WishlistController.getWishlistByUserId(
-    req.payload.uid
-  );
-  if (error) return HttpResponseHandler.InternalServerError(res, message);
-  HttpResponseHandler.Success(res, data);
+  const { data, message, errors, status } =
+    await WishlistController.getWishlistByUserId(req.payload.uid);
+  if (errors)
+    return HttpResponseHandler.InternalServerError(res, errors, status);
+  HttpResponseHandler.Success(res, data, message, status);
 });
 
 /**
@@ -66,6 +72,12 @@ router.get('/', checkLogin, async (req, res) => {
  *            schema:
  *              type: object
  *              properties:
+ *                message:
+ *                  type: string
+ *                  example: create wishlist successfully
+ *                status:
+ *                  type: string
+ *                  example: success
  *                data:
  *                  type: string
  *       '400':
@@ -80,18 +92,20 @@ router.post(
   checkLogin,
   checkBadRequest(['post_id']),
   async (req, res) => {
-    const { data, message, error } = await WishlistController.createWishlist({
-      ...req.body,
-      user_id: req.payload.uid,
-    });
-    if (error) return HttpResponseHandler.InternalServerError(res, message);
-    HttpResponseHandler.Success(res, data);
+    const { data, message, errors, status } =
+      await WishlistController.createWishlist({
+        ...req.body,
+        user_id: req.payload.uid,
+      });
+    if (errors)
+      return HttpResponseHandler.InternalServerError(res, errors, status);
+    HttpResponseHandler.Success(res, data, message, status);
   }
 );
 
 /**
  * @openapi
- * /api/v1/wishlist/delete/{id}:
+ * /api/v1/wishlist/{id}/delete:
  *  delete:
  *    tags:
  *      - Wishlist
@@ -108,6 +122,12 @@ router.post(
  *            schema:
  *              type: object
  *              properties:
+ *                message:
+ *                  type: string
+ *                  example: delete wishlist successfully
+ *                status:
+ *                  type: string
+ *                  example: success
  *                data:
  *                  type: string
  *       '400':
@@ -117,13 +137,16 @@ router.post(
  *    security:
  *      - bearerAuth: []
  */
-router.delete('/delete/:id', checkLogin, async (req, res) => {
+router.delete('/:id/delete', checkLogin, async (req, res) => {
   const { id } = req.params;
-  const { data, message, error, hasPermission } =
+  const { data, message, errors, status } =
     await WishlistController.deleteWishlist(id, req.payload.uid);
-  if (hasPermission) return HttpResponseHandler.Forbidden(res, message);
-  if (error) return HttpResponseHandler.InternalServerError(res, message);
-  HttpResponseHandler.Success(res, data);
+  if (errors) {
+    if (errors.status === 403)
+      return HttpResponseHandler.Forbidden(res, errors, status);
+    return HttpResponseHandler.InternalServerError(res, errors, status);
+  }
+  HttpResponseHandler.Success(res, data, message, status);
 });
 
 /**
@@ -141,27 +164,29 @@ router.delete('/delete/:id', checkLogin, async (req, res) => {
  *            schema:
  *              type: object
  *              properties:
+ *                status:
+ *                  type: string
+ *                  example: success
  *                data:
  *                  type: string
  *                message:
  *                  type: string
+ *                  example: clear wishlist successfully
  *       '403':
  *        description: Forbidden
  *       '401':
  *        description: Unauthorized
- *       '400':
- *        description: Bad Request
  *       '500':
  *        description: Internal Server Error
  *    security:
  *      - bearerAuth: []
  */
 router.delete('/clear', checkLogin, async (req, res) => {
-  const { data, message, error } = await WishlistController.clearWishlist(
-    req.payload.uid
-  );
-  if (error) return HttpResponseHandler.InternalServerError(res, message);
-  HttpResponseHandler.Success(res, data);
+  const { data, message, errors, status } =
+    await WishlistController.clearWishlist(req.payload.uid);
+  if (errors)
+    return HttpResponseHandler.InternalServerError(res, errors, status);
+  HttpResponseHandler.Success(res, data, message, status);
 });
 
 module.exports = router;

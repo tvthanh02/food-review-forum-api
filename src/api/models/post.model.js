@@ -4,7 +4,10 @@ const { POST_STATUS } = require('../../constants');
 const postSchema = new mongoose.Schema(
   {
     position: String,
-    food_name: String,
+    food_name: {
+      type: String,
+      required: true,
+    },
     user_id: {
       type: mongoose.Types.ObjectId,
       ref: 'User',
@@ -12,13 +15,17 @@ const postSchema = new mongoose.Schema(
     },
     province: {
       type: String,
+      required: true,
     },
     maps: {
       latitude: String,
       longitude: String,
     },
     description: String,
-    thumbnail: String,
+    thumbnail: {
+      type: String,
+      required: true,
+    },
     images: [String],
     videos: [String],
     hashtags: String,

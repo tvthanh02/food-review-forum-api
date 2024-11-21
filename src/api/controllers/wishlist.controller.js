@@ -1,4 +1,5 @@
 const Wishlist = require('../models/wishlist.model');
+const { createResponse } = require('../helpers');
 
 class WishlistController {
   static async getWishlistByUserId(userId) {
@@ -6,31 +7,38 @@ class WishlistController {
       const wishlist = await Wishlist.find({ user_id: userId })
         .populate('post_info')
         .exec();
-      return {
-        data: wishlist.map((item) => item.post_info),
-      };
+      return createResponse(
+        'success',
+        'get user wishlist successfully',
+        wishlist?.map((item) => item.post_info) ?? [],
+        null
+      );
     } catch (error) {
-      return {
-        data: null,
-        message: error.message,
-        error: 1,
-      };
+      return createResponse('error', null, null, {
+        status: 500,
+        title: 'Have error when get wislist',
+        detail: error.message,
+        source: 'controller/wishlist/getWishlistByUserId',
+      });
     }
   }
 
   static async createWishlist(data) {
     try {
       const newWishlist = await Wishlist.create(data);
-      await newWishlist.save();
-      return {
-        data: newWishlist._id,
-      };
+      return createResponse(
+        'success',
+        'Create wishlist successfully',
+        newWishlist._id,
+        null
+      );
     } catch (error) {
-      return {
-        data: null,
-        message: error.message,
-        error: 1,
-      };
+      return createResponse('error', null, null, {
+        status: 500,
+        title: 'Have error when create wishlist',
+        detail: error.message,
+        source: 'controller/wishlist/createWishlist',
+      });
     }
   }
 
@@ -39,40 +47,47 @@ class WishlistController {
       const wishlist = await Wishlist.findById(wishlistId).exec();
 
       if (wishlist.user_id.toString() !== currentUserId) {
-        return {
-          data: null,
-          message: 'You are not authorized to delete this wishlist',
-          error: 1,
-          hasPermission: true,
-        };
+        return createResponse('error', null, null, {
+          status: 403,
+          title: 'Forbidden',
+          detail: "You don't have permission to delete this wishlist",
+          source: 'controller/wishlist/deleteWishlist',
+        });
       }
 
       await wishlist.remove();
-      return {
-        data: wishlist._id,
-      };
+      return createResponse(
+        'success',
+        'Delete wishlist successfully',
+        wishlist._id,
+        null
+      );
     } catch (error) {
-      return {
-        data: null,
-        message: error.message,
-        error: 1,
-      };
+      return createResponse('error', null, null, {
+        status: 500,
+        title: 'Have error when delete wishlist',
+        detail: error.message,
+        source: 'controller/wishlist/deleteWishlist',
+      });
     }
   }
 
   static async clearWishlist(userId) {
     try {
       const wishlist = await Wishlist.deleteMany({ user_id: userId }).exec();
-      return {
-        data: wishlist.deletedCount,
-        message: 'Clear wishlist successfully',
-      };
+      return createResponse(
+        'success',
+        'Clear wishlist successfully',
+        wishlist.deletedCount,
+        null
+      );
     } catch (error) {
-      return {
-        data: null,
-        message: error.message,
-        error: 1,
-      };
+      return createResponse('error', null, null, {
+        status: 500,
+        title: 'Have error when clear wishlist',
+        detail: error.message,
+        source: 'controller/wishlist/clearWishlist',
+      });
     }
   }
 }

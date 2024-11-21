@@ -3,12 +3,15 @@ const { CATEGORY_STATUS } = require('../../constants');
 
 const categorySchema = new mongoose.Schema(
   {
-    category_name: String,
+    category_name: {
+      type: String,
+      required: true,
+    },
     description: String,
     status: {
       type: String,
       enum: [...CATEGORY_STATUS],
-      default: 'active',
+      required: true,
     },
   },
   {

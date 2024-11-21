@@ -31,6 +31,12 @@ const { checkMulterError } = require('../middlewares/common.middleware');
  *            schema:
  *              type: object
  *              properties:
+ *                status:
+ *                  type: string
+ *                  example: success
+ *                message:
+ *                  type: string
+ *                  example: uploaded
  *                data:
  *                  type: string
  *       '500':
@@ -38,9 +44,19 @@ const { checkMulterError } = require('../middlewares/common.middleware');
  */
 router.post('/upload', upload.single('file'), checkMulterError, (req, res) => {
   const { file } = req;
-  if (!file) return HttpResponseHandler.BadRequest(res);
+  if (!file)
+    return HttpResponseHandler.BadRequest(
+      res,
+      {
+        status: 500,
+        title: 'Internal Server Error',
+        detail: 'Internal Server Error',
+        source: 'controller/upload',
+      },
+      'error'
+    );
   const paths = uploadController.uploadSingle(file);
-  HttpResponseHandler.Success(res, paths);
+  HttpResponseHandler.Success(res, paths, 'uploaded', 'success');
 });
 
 /**
@@ -71,6 +87,12 @@ router.post('/upload', upload.single('file'), checkMulterError, (req, res) => {
  *            schema:
  *              type: object
  *              properties:
+ *                status:
+ *                  type: string
+ *                  example: success
+ *                message:
+ *                  type: string
+ *                  example: uploaded
  *                data:
  *                  type: array
  *                  items:
@@ -84,9 +106,19 @@ router.post(
   checkMulterError,
   (req, res) => {
     const { files } = req;
-    if (!files) return HttpResponseHandler.BadRequest(res);
+    if (!files)
+      return HttpResponseHandler.BadRequest(
+        res,
+        {
+          status: 500,
+          title: 'Internal Server Error',
+          detail: 'Internal Server Error',
+          source: 'controller/upload',
+        },
+        'error'
+      );
     const data = uploadController.uploadMultiple(files);
-    HttpResponseHandler.Success(res, data);
+    HttpResponseHandler.Success(res, data, 'uploaded', 'success');
   }
 );
 

@@ -26,33 +26,16 @@ require('dotenv').config();
  *            schema:
  *              type: object
  *              properties:
- *               data:
- *                  type: object
- *                  properties:
- *                    data:
- *                      type: array
- *                      items:
- *                        type: object
- *                        properties:
- *                          _id:
- *                            type: string
- *                          rate:
- *                            type: number
- *                          post_id:
- *                            type: string
- *                            format: ObjectId
- *                          user_id:
- *                            type: string
- *                            format: ObjectId
- *                          user_info:
- *                            type: object
- *                            properties:
- *                              user_name:
- *                                type: string
- *                              avatar:
- *                                type: string
- *                              email:
- *                                type: string
+ *                status:
+ *                  type: string
+ *                  example: success
+ *                message:
+ *                  type: string
+ *                  example: get rate successfully
+ *                data:
+ *                  type: array
+ *                  items:
+ *                    $ref: '#/components/schemas/Rate'
  *       '400':
  *        description: Bad Request
  *       '500':
@@ -62,11 +45,11 @@ router.get('/:postId', async (req, res) => {
   if (!req.params.postId) {
     return HttpResponseHandler.BadRequest(res);
   }
-  const { data, message, error } = await RateController.getRateByPostId(
-    req.params.postId
-  );
-  if (error) return HttpResponseHandler.InternalServerError(res);
-  HttpResponseHandler.Success(res, data, message);
+  const { data, message, errors, status } =
+    await RateController.getRateByPostId(req.params.postId);
+  if (errors)
+    return HttpResponseHandler.InternalServerError(res, errors, status);
+  HttpResponseHandler.Success(res, data, message, status);
 });
 
 /**
@@ -96,7 +79,16 @@ router.get('/:postId', async (req, res) => {
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/Rate'
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: string
+ *                  example: success
+ *                message:
+ *                  type: string
+ *                  example: create rate successfully
+ *                data:
+ *                  $ref: '#/components/schemas/Rate'
  *       '400':
  *        description: Bad Request
  *       '500':
@@ -111,13 +103,14 @@ router.post(
   async (req, res) => {
     const { rate, post_id } = req.body;
     const uid = req.payload.uid;
-    const { data, message, error } = await RateController.createRate(
+    const { data, message, errors, status } = await RateController.createRate(
       rate,
       post_id,
       uid
     );
-    if (error) return HttpResponseHandler.InternalServerError(res);
-    HttpResponseHandler.Success(res, data, message);
+    if (errors)
+      return HttpResponseHandler.InternalServerError(res, errors, status);
+    HttpResponseHandler.Success(res, data, message, status);
   }
 );
 

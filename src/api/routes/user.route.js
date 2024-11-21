@@ -2,7 +2,11 @@ const express = require('express');
 const router = express.Router();
 const HttpResponseHandler = require('../helpers/response-handler.helper');
 const UserController = require('../controllers/user.controller');
-const { checkLogin, isAdmin } = require('../middlewares/auth.middleware');
+const {
+  checkLogin,
+  isAdmin,
+  hasRole,
+} = require('../middlewares/auth.middleware');
 
 /**
  * @openapi
@@ -52,6 +56,12 @@ const { checkLogin, isAdmin } = require('../middlewares/auth.middleware');
  *               data:
  *                 type: object
  *                 properties:
+ *                   status:
+ *                     type: string
+ *                     example: success
+ *                   message:
+ *                     type: string
+ *                     example: get all users successfully
  *                   data:
  *                     type: array
  *                     items:
@@ -66,9 +76,11 @@ const { checkLogin, isAdmin } = require('../middlewares/auth.middleware');
  *      - bearerAuth: []
  */
 router.get('/', async (req, res) => {
-  const { data, message, error } = await UserController.getAllUsers(req.query);
-  if (error) return HttpResponseHandler.InternalServerError(res);
-  HttpResponseHandler.Success(res, data, message);
+  const { data, message, errors, status, meta } =
+    await UserController.getAllUsers(req.query);
+  if (errors)
+    return HttpResponseHandler.InternalServerError(res.errors, status);
+  HttpResponseHandler.Success(res, data, message, status, meta);
 });
 
 /**
@@ -90,6 +102,12 @@ router.get('/', async (req, res) => {
  *            schema:
  *              type: object
  *              properties:
+ *               status:
+ *                 type: string
+ *                 example: success
+ *               message:
+ *                 type: string
+ *                 example: get user detail successfully
  *               data:
  *                  $ref: '#/components/schemas/Profile'
  *       '400':
@@ -102,15 +120,19 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
   if (!id) return HttpResponseHandler.BadRequest(res);
-  const { data, message, error } = await UserController.getDetailUser(id);
-  if (error) return HttpResponseHandler.InternalServerError(res);
-  if (!data) return HttpResponseHandler.NotFound(res);
-  HttpResponseHandler.Success(res, data, message);
+  const { data, message, errors, status } =
+    await UserController.getDetailUser(id);
+  if (errors) {
+    if (errors.status === 404)
+      return HttpResponseHandler.NotFound(res, errors, status);
+    return HttpResponseHandler.InternalServerError(res, errors, status);
+  }
+  HttpResponseHandler.Success(res, data, message, status);
 });
 
 /**
  * @openapi
- * /api/v1/user/update/{id}:
+ * /api/v1/user/{id}/update:
  *  patch:
  *    tags:
  *      - User
@@ -145,7 +167,17 @@ router.get('/:id', async (req, res) => {
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/Profile'
+ *              type: object
+ *              properties:
+ *               status:
+ *                 type: string
+ *                 example: success
+ *               message:
+ *                 type: string
+ *                 example: update user successfully
+ *               data:
+ *                 schema:
+ *                    $ref: '#/components/schemas/Profile'
  *       '400':
  *        description: Bad Request
  *       '500':
@@ -153,20 +185,79 @@ router.get('/:id', async (req, res) => {
  *    security:
  *      - bearerAuth: []
  */
-router.patch('/update/:id', checkLogin, async (req, res) => {
+router.patch('/:id/update', checkLogin, async (req, res) => {
   const { id } = req.params;
   if (!id) return HttpResponseHandler.BadRequest(res);
-  const { data, message, error } = await UserController.updateUser(
+  const { data, message, errors, status } = await UserController.updateUser(
     id,
     req.body
   );
-  if (error) return HttpResponseHandler.InternalServerError(res);
-  HttpResponseHandler.Success(res, data, message);
+  if (errors)
+    return HttpResponseHandler.InternalServerError(res, errors, status);
+  HttpResponseHandler.Success(res, data, message, status);
 });
 
 /**
  * @openapi
- * /api/v1/user/delete/{id}:
+ * /api/v1/user/{id}/ban:
+ *  post:
+ *    tags:
+ *      - User
+ *    operationId: ban
+ *    parameters:
+ *      - in: path
+ *        name: id
+ *        required: true
+ *    responses:
+ *       '200':
+ *        description: Success
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *               status:
+ *                 type: string
+ *                 example: success
+ *               message:
+ *                 type: string
+ *                 example: ban user successfully
+ *               data:
+ *                 type: string
+ *       '400':
+ *        description: Bad Request
+ *       '500':
+ *        description: Internal Server Error
+ *    security:
+ *      - bearerAuth: []
+ */
+router.patch(
+  '/:id/ban',
+  checkLogin,
+  hasRole(['admin', 'subadmin']),
+  async (req, res) => {
+    const { id } = req.params;
+    if (!id)
+      return HttpResponseHandler.BadRequest(
+        res,
+        {
+          status: 400,
+          message: 'Bad Request',
+          errors: 'Missing id',
+          source: 'controller',
+        },
+        'error'
+      );
+    const { data, message, errors, status } = await UserController.banUser(id);
+    if (errors)
+      return HttpResponseHandler.InternalServerError(res, errors, status);
+    HttpResponseHandler.Success(res, data, message, status);
+  }
+);
+
+/**
+ * @openapi
+ * /api/v1/user/{id}/delete:
  *  delete:
  *    tags:
  *      - User
@@ -183,8 +274,15 @@ router.patch('/update/:id', checkLogin, async (req, res) => {
  *            schema:
  *              type: object
  *              properties:
- *                _id:
- *                  type: string
+ *               status:
+ *                 type: string
+ *                 example: success
+ *               message:
+ *                 type: string
+ *                 example: delete user successfully
+ *               data:
+ *                 type: string
+ *                 example: 673f785f6ab18a000c41d455
  *       '400':
  *        description: Bad Request
  *       '500':
@@ -192,12 +290,13 @@ router.patch('/update/:id', checkLogin, async (req, res) => {
  *    security:
  *      - bearerAuth: []
  */
-router.delete('/delete/:id', checkLogin, isAdmin, (req, res) => {
+router.delete('/:id/delete', checkLogin, isAdmin, async (req, res) => {
   const { id } = req.params;
   if (!id) return HttpResponseHandler.BadRequest(res);
-  const { data, message, error } = UserController.deleteUser(id);
-  if (error) return HttpResponseHandler.InternalServerError(res);
-  HttpResponseHandler.Success(res, data, message);
+  const { data, message, errors, status } = await UserController.deleteUser(id);
+  if (errors)
+    return HttpResponseHandler.InternalServerError(res, errors, status);
+  HttpResponseHandler.Success(res, data, message, status);
 });
 
 module.exports = router;

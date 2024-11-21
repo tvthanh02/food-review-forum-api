@@ -22,6 +22,7 @@ require('dotenv').config();
  *            type: object
  *            required:
  *              - content
+ *              - post_id
  *            properties:
  *              content:
  *                type: string
@@ -46,26 +47,17 @@ require('dotenv').config();
  *          application/json:
  *            schema:
  *              type: object
- *              required:
- *                - content
- *                - post_id
  *              properties:
- *               content:
- *                 type: string
- *               post_id:
- *                 type: string
- *               parent_id:
- *                 type: string
- *               reply_to_user_id:
- *                 type: string
- *               images:
- *                 type: array
- *                 items:
- *                   type: string
- *               videos:
- *                 type: array
- *                 items:
- *                   type: string
+ *                status:
+ *                  type: string
+ *                  example: success
+ *                message:
+ *                  type: string
+ *                  example: Comment created successfully
+ *                data:
+ *                  type: array
+ *                  items:
+ *                    $ref: '#/components/schemas/Comment'
  *        '400':
  *          description: BadRequest
  *        '500':
@@ -79,14 +71,15 @@ router.post(
   checkBadRequest(['content']),
   async (req, res) => {
     const userId = req.payload.uid;
-    const { data, message, error } = await CommentController.createComment({
-      ...req.body,
-      user_id: userId,
-    });
-    if (error) {
-      return HttpResponseHandler.InternalServerError(res, message);
+    const { data, message, errors, status } =
+      await CommentController.createComment({
+        ...req.body,
+        user_id: userId,
+      });
+    if (errors) {
+      return HttpResponseHandler.InternalServerError(res, errors, status);
     }
-    return HttpResponseHandler.Success(res, data);
+    return HttpResponseHandler.Success(res, data, message, status);
   }
 );
 
@@ -111,6 +104,12 @@ router.post(
  *            schema:
  *              type: object
  *              properties:
+ *               status:
+ *                 type: string
+ *                 example: success
+ *               message:
+ *                 type: string
+ *                 example: get comments successfully
  *               data:
  *                 type: array
  *                 items:
@@ -122,11 +121,11 @@ router.post(
  */
 router.get('/:postId', async (req, res) => {
   if (!req.params.postId) return HttpResponseHandler.BadRequest(res);
-  const { data, message, error } = await CommentController.getCommentByPostId(
-    req.params.postId
-  );
-  if (error) return HttpResponseHandler.InternalServerError(res);
-  HttpResponseHandler.Success(res, data, message);
+  const { data, message, errors, status } =
+    await CommentController.getCommentByPostId(req.params.postId);
+  if (errors)
+    return HttpResponseHandler.InternalServerError(res, errors, status);
+  HttpResponseHandler.Success(res, data, message, status);
 });
 
 /**
@@ -150,6 +149,12 @@ router.get('/:postId', async (req, res) => {
  *            schema:
  *              type: object
  *              properties:
+ *               status:
+ *                 type: string
+ *                 example: success
+ *               message:
+ *                 type: string
+ *                 example: get comments successfully
  *               data:
  *                 type: array
  *                 items:
@@ -162,15 +167,16 @@ router.get('/:postId', async (req, res) => {
 router.get('/:id/reply', async (req, res) => {
   const { id } = req.params;
   if (!id) return HttpResponseHandler.BadRequest(res);
-  const { data, message, error } =
+  const { data, message, errors, status } =
     await CommentController.getReplyByCommentId(id);
-  if (error) return HttpResponseHandler.InternalServerError(res, message);
-  HttpResponseHandler.Success(res, data);
+  if (errors)
+    return HttpResponseHandler.InternalServerError(res, errors, status);
+  HttpResponseHandler.Success(res, data, message, status);
 });
 
 /**
  * @openapi
- * /api/v1/comment/update/{id}:
+ * /api/v1/comment/{id}/update:
  *  patch:
  *    tags:
  *      - Comment
@@ -201,25 +207,33 @@ router.get('/:id/reply', async (req, res) => {
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/Comment'
+ *              type: object
+ *              properties:
+ *               status:
+ *                 type: string
+ *                 example: success
+ *               message:
+ *                 type: string
+ *                 example: update comment successfully
+ *               data:
+ *                 $ref: '#/components/schemas/Comment'
  *        '400':
  *          description: BadRequest
  *        '500':
  *          description: InternalServerError
  */
-router.patch('/update/:id', checkLogin, async (req, res) => {
+router.patch('/:id/update', checkLogin, async (req, res) => {
   if (!req.params.id) return HttpResponseHandler.BadRequest(res);
-  const { data, message, error } = await CommentController.updateComment(
-    req.params.id,
-    req.body
-  );
-  if (error) return HttpResponseHandler.InternalServerError(res);
-  HttpResponseHandler.Success(res, data, message);
+  const { data, message, errors, status } =
+    await CommentController.updateComment(req.params.id, req.body);
+  if (errors)
+    return HttpResponseHandler.InternalServerError(res, errors, status);
+  HttpResponseHandler.Success(res, data, message, status);
 });
 
 /**
  * @openapi
- * /api/v1/comment/delete/{id}:
+ * /api/v1/comment/{id}/delete:
  *  delete:
  *    tags:
  *      - Comment
@@ -236,6 +250,12 @@ router.patch('/update/:id', checkLogin, async (req, res) => {
  *            schema:
  *              type: object
  *              properties:
+ *               status:
+ *                 type: string
+ *                 example: success
+ *               message:
+ *                 type: string
+ *                 example: delete comment successfully
  *               data:
  *                 type: string
  *        '400':
@@ -243,13 +263,13 @@ router.patch('/update/:id', checkLogin, async (req, res) => {
  *        '500':
  *          description: InternalServerError
  */
-router.delete('/delete/:id', checkLogin, async (req, res) => {
+router.delete('/:id/delete', checkLogin, async (req, res) => {
   if (!req.params.id) return HttpResponseHandler.BadRequest(res);
-  const { data, message, error } = await CommentController.deleteComment(
-    req.params.id
-  );
-  if (error) return HttpResponseHandler.InternalServerError(res);
-  HttpResponseHandler.Success(res, data, message);
+  const { data, message, errors, status } =
+    await CommentController.deleteComment(req.params.id);
+  if (errors)
+    return HttpResponseHandler.InternalServerError(res, errors, status);
+  HttpResponseHandler.Success(res, data, message, status);
 });
 
 module.exports = router;

@@ -39,6 +39,12 @@ const HttpResponseHandler = require('../helpers/response-handler.helper');
  *            schema:
  *              type: object
  *              properties:
+ *                status:
+ *                  type: string
+ *                  example: success
+ *                message:
+ *                  type: string
+ *                  example: get all report types
  *                data:
  *                  type: array
  *                  items:
@@ -48,17 +54,19 @@ const HttpResponseHandler = require('../helpers/response-handler.helper');
  *                        type: string
  *                      name:
  *                        type: string
- *       '403':
- *        description: Forbidden
+ *                      status:
+ *                        type: string
+ *                meta:
+ *                  $ref: '#/components/schemas/Meta'
  *       '500':
  *        description: Internal Server Error
  */
 router.get('/', async (req, res) => {
-  const { data, message, error } = await ReportTypeController.getAllReportTypes(
-    req.query
-  );
-  if (error) return HttpResponseHandler.InternalServerError(res, message);
-  return HttpResponseHandler.Success(res, data);
+  const { data, message, errors, status, meta } =
+    await ReportTypeController.getAllReportTypes(req.query);
+  if (errors)
+    return HttpResponseHandler.InternalServerError(res, errors, status);
+  return HttpResponseHandler.Success(res, data, message, status, meta);
 });
 
 /**
@@ -80,6 +88,12 @@ router.get('/', async (req, res) => {
  *            schema:
  *              type: object
  *              properties:
+ *                status:
+ *                  type: string
+ *                  example: success
+ *                message:
+ *                  type: string
+ *                  example: get report type detail
  *                data:
  *                  type: object
  *                  properties:
@@ -97,10 +111,11 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
   if (!id) return HttpResponseHandler.BadRequest(res);
-  const { data, message, error } =
+  const { data, message, errors, status } =
     await ReportTypeController.getReportTypeDetail(id);
-  if (error) return HttpResponseHandler.InternalServerError(res, message);
-  return HttpResponseHandler.Success(res, data);
+  if (errors)
+    return HttpResponseHandler.InternalServerError(res, errors, status);
+  return HttpResponseHandler.Success(res, data, message, status);
 });
 
 /**
@@ -118,9 +133,13 @@ router.get('/:id', async (req, res) => {
  *            type: object
  *            required:
  *              - name
+ *              - status
  *            properties:
  *              name:
  *                type: string
+ *              status:
+ *                type: string
+ *                enum: ['Active', 'Inactive']
  *    responses:
  *       '200':
  *        description: Success
@@ -129,12 +148,20 @@ router.get('/:id', async (req, res) => {
  *            schema:
  *              type: object
  *              properties:
+ *                status:
+ *                  type: string
+ *                  example: success
+ *                message:
+ *                  type: string
+ *                  example: create report type
  *                data:
  *                  type: object
  *                  properties:
  *                    _id:
  *                      type: string
  *                    name:
+ *                      type: string
+ *                    status:
  *                      type: string
  *       '403':
  *        description: Forbidden
@@ -156,16 +183,17 @@ router.post(
         res,
         "Status must be 'Active' or 'Inactive'"
       );
-    const { data, message, error } =
+    const { data, message, errors, status } =
       await ReportTypeController.createReportType(req.body);
-    if (error) return HttpResponseHandler.InternalServerError(res, message);
-    return HttpResponseHandler.Success(res, data);
+    if (errors)
+      return HttpResponseHandler.InternalServerError(res, errors, status);
+    return HttpResponseHandler.Success(res, data, message, status);
   }
 );
 
 /**
  * @openapi
- * /api/v1/report-type/update/{id}:
+ * /api/v1/report-type/{id}/update:
  *  patch:
  *    tags:
  *      - Report Type
@@ -180,11 +208,12 @@ router.post(
  *        application/json:
  *          schema:
  *            type: object
- *            required:
- *              - name
  *            properties:
  *              name:
  *                type: string
+ *              status:
+ *                type: string
+ *                enum: ['Active', 'Inactive']
  *    responses:
  *       '200':
  *        description: Success
@@ -200,6 +229,8 @@ router.post(
  *                      type: string
  *                    name:
  *                      type: string
+ *                    status:
+ *                      type: string
  *       '403':
  *        description: Forbidden
  *       '400':
@@ -209,22 +240,21 @@ router.post(
  *    security:
  *      - bearerAuth: []
  */
-router.patch('/update/:id', checkLogin, isAdmin, async (req, res) => {
+router.patch('/:id/update', checkLogin, isAdmin, async (req, res) => {
   if (Object.keys(req.body).length === 0)
     return HttpResponseHandler.BadRequest(res);
   const { id } = req.params;
   if (!id) return HttpResponseHandler.BadRequest(res);
-  const { data, message, error } = await ReportTypeController.updateReportType(
-    id,
-    req.body
-  );
-  if (error) return HttpResponseHandler.InternalServerError(res, message);
-  return HttpResponseHandler.Success(res, data);
+  const { data, message, errors, status } =
+    await ReportTypeController.updateReportType(id, req.body);
+  if (errors)
+    return HttpResponseHandler.InternalServerError(res, errors, status);
+  return HttpResponseHandler.Success(res, data, message, status);
 });
 
 /**
  * @openapi
- * /api/v1/report-type/delete/{id}:
+ * /api/v1/report-type/{id}/delete:
  *  delete:
  *    tags:
  *      - Report Type
@@ -241,6 +271,12 @@ router.patch('/update/:id', checkLogin, isAdmin, async (req, res) => {
  *            schema:
  *              type: object
  *              properties:
+ *                status:
+ *                  type: string
+ *                  example: success
+ *                message:
+ *                  type: string
+ *                  example: delete report type
  *                data:
  *                  type: string
  *       '403':
@@ -252,12 +288,14 @@ router.patch('/update/:id', checkLogin, isAdmin, async (req, res) => {
  *    security:
  *      - bearerAuth: []
  */
-router.delete('/delete/:id', checkLogin, isAdmin, (req, res) => {
+router.delete('/:id/delete', checkLogin, isAdmin, async (req, res) => {
   const { id } = req.params;
   if (!id) return HttpResponseHandler.BadRequest(res);
-  const { data, message, error } = ReportTypeController.deleteReportType(id);
-  if (error) return HttpResponseHandler.InternalServerError(res, message);
-  return HttpResponseHandler.Success(res, data);
+  const { data, message, errors, status } =
+    await ReportTypeController.deleteReportType(id);
+  if (errors)
+    return HttpResponseHandler.InternalServerError(res, errors, status);
+  return HttpResponseHandler.Success(res, data, message, status);
 });
 
 module.exports = router;

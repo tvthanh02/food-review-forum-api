@@ -41,26 +41,29 @@ const { checkBadRequest } = require('../middlewares/common.middleware');
  *            schema:
  *              type: object
  *              properties:
+ *               status:
+ *                 type: string
+ *                 example: success
+ *               message:
+ *                 type: string
+ *                 example: get all categories successfully
  *               data:
- *                 type: object
- *                 properties:
- *                   data:
- *                     type: array
- *                     items:
- *                       $ref: '#/components/schemas/Category'
- *                   meta:
- *                     $ref: '#/components/schemas/Meta'
+ *                 type: array
+ *                 items:
+ *                   $ref: '#/components/schemas/Category'
+ *               meta:
+ *                 $ref: '#/components/schemas/Meta'
  *       '400':
  *        description: Bad Request
  *       '500':
  *        description: Internal Server Error
  */
 router.get('/', async (req, res) => {
-  const { data, message, error } = await CategoryController.getAllCategories(
-    req.query
-  );
-  if (error) return HttpResponseHandler.InternalServerError(res);
-  HttpResponseHandler.Success(res, data, message);
+  const { data, message, errors, status, meta } =
+    await CategoryController.getAllCategories(req.query);
+  if (errors)
+    return HttpResponseHandler.InternalServerError(res, errors, status);
+  HttpResponseHandler.Success(res, data, message, status, meta);
 });
 
 /**
@@ -82,18 +85,30 @@ router.get('/', async (req, res) => {
  *            schema:
  *              type: object
  *              properties:
+ *               status:
+ *                 type: string
+ *                 example: success
+ *               message:
+ *                 type: string
+ *                 example: get detail category successfully
  *               data:
  *                 $ref: '#/components/schemas/Category'
  *       '500':
  *        description: Internal Server Error
+ *    security:
+ *      - bearerAuth: []
  */
-router.get('/:id', async (req, res) => {
+router.get('/:id', checkLogin, isAdmin, async (req, res) => {
   const { id } = req.params;
   if (!id) return HttpResponseHandler.BadRequest(res);
-  const { data, message, error } =
+  const { data, message, errors, status } =
     await CategoryController.getDetailCategory(id);
-  if (error) return HttpResponseHandler.InternalServerError(res);
-  HttpResponseHandler.Success(res, data, message);
+  if (errors) {
+    if (errors.status === 404)
+      return HttpResponseHandler.NotFound(res, errors, status);
+    return HttpResponseHandler.InternalServerError(res, errors, status);
+  }
+  HttpResponseHandler.Success(res, data, message, status);
 });
 
 /**
@@ -104,24 +119,38 @@ router.get('/:id', async (req, res) => {
  *      - Category
  *    operationId: categoryCreate
  *    requestBody:
+ *      required: true
  *      content:
  *        application/json:
  *          schema:
  *            type: object
  *            required:
  *              - category_name
+ *              - status
  *            properties:
  *              category_name:
  *                type: string
  *              description:
  *                type: string
+ *              status:
+ *                type: string
+ *                enum: ['Active', 'Inactive']
  *    responses:
  *       '200':
  *        description: Success
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/Category'
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: string
+ *                  example: success
+ *                message:
+ *                  type: string
+ *                  example: create category successfully
+ *                data:
+ *                  $ref: '#/components/schemas/Category'
  *       '400':
  *        description: Bad Request
  *       '500':
@@ -133,19 +162,19 @@ router.post(
   '/create',
   checkLogin,
   isAdmin,
-  checkBadRequest(['category_name']),
+  checkBadRequest(['category_name', 'status']),
   async (req, res) => {
-    const { data, message, error } = await CategoryController.createCategory(
-      req.body
-    );
-    if (error) return HttpResponseHandler.InternalServerError(res);
-    HttpResponseHandler.Success(res, data, message);
+    const { data, message, errors, status } =
+      await CategoryController.createCategory(req.body);
+    if (errors)
+      return HttpResponseHandler.InternalServerError(res, errors, status);
+    HttpResponseHandler.Success(res, data, message, status);
   }
 );
 
 /**
  * @openapi
- * /api/v1/category/update/{id}:
+ * /api/v1/category/{id}/update:
  *  patch:
  *    tags:
  *      - Category
@@ -164,13 +193,25 @@ router.post(
  *                type: string
  *              description:
  *                type: string
+ *              status:
+ *                type: string
+ *                enum: ['Active', 'Inactive']
  *    responses:
  *       '200':
  *        description: Success
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/Category'
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: string
+ *                  example: success
+ *                message:
+ *                  type: string
+ *                  example: update category successfully
+ *                data:
+ *                  $ref: '#/components/schemas/Category'
  *       '400':
  *        description: Bad Request
  *       '500':
@@ -178,20 +219,26 @@ router.post(
  *    security:
  *      - bearerAuth: []
  */
-router.patch('/update/:id', checkLogin, isAdmin, async (req, res) => {
+router.patch('/:id/update', checkLogin, isAdmin, async (req, res) => {
   const { id } = req.params;
   if (!id) return HttpResponseHandler.BadRequest(res);
-  const { data, message, error } = await CategoryController.updateCategory(
-    id,
-    req.body
-  );
-  if (error) return HttpResponseHandler.InternalServerError(res);
-  HttpResponseHandler.Success(res, data, message);
+  Object.entries(req.body).some(
+    // eslint-disable-next-line no-unused-vars
+    ([key, _]) => !['category_name', 'description', 'status'].includes(key)
+  ) && HttpResponseHandler.BadRequest(res);
+  const { data, message, errors, status } =
+    await CategoryController.updateCategory(id, req.body);
+  if (errors) {
+    if (errors.status === 404)
+      return HttpResponseHandler.NotFound(res, errors, status);
+    return HttpResponseHandler.InternalServerError(res, errors, status);
+  }
+  HttpResponseHandler.Success(res, data, message, status);
 });
 
 /**
  * @openapi
- * /api/v1/category/delete/{id}:
+ * /api/v1/category/{id}/delete:
  *  delete:
  *    tags:
  *      - Category
@@ -208,7 +255,13 @@ router.patch('/update/:id', checkLogin, isAdmin, async (req, res) => {
  *            schema:
  *              type: object
  *              properties:
- *                _id:
+ *                status:
+ *                  type: string
+ *                  example: success
+ *                message:
+ *                  type: string
+ *                  example: delete category successfully
+ *                data:
  *                  type: string
  *       '400':
  *        description: Bad Request
@@ -217,12 +270,26 @@ router.patch('/update/:id', checkLogin, isAdmin, async (req, res) => {
  *    security:
  *      - bearerAuth: []
  */
-router.delete('/delete/:id', checkLogin, isAdmin, (req, res) => {
+router.delete('/:id/delete', checkLogin, isAdmin, async (req, res) => {
   const { id } = req.params;
-  if (!id) return HttpResponseHandler.BadRequest(res);
-  const { data, message, error } = CategoryController.deleteCategory(id);
-  if (error) return HttpResponseHandler.InternalServerError(res);
-  HttpResponseHandler.Success(res, data, message);
+  console.log('delete run');
+  if (!id)
+    return HttpResponseHandler.BadRequest(
+      res,
+      {
+        status: 400,
+        title: 'Bad Request',
+        detail: 'id is required',
+        source: 'controller',
+      },
+      'error'
+    );
+  const { data, message, errors, status } =
+    await CategoryController.deleteCategory(id);
+
+  if (errors)
+    return HttpResponseHandler.InternalServerError(res, errors, status);
+  HttpResponseHandler.Success(res, data, message, status);
 });
 
 module.exports = router;

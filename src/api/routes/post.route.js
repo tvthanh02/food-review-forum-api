@@ -35,24 +35,28 @@ const { checkBadRequest } = require('../middlewares/common.middleware');
  *            schema:
  *              type: object
  *              properties:
+ *                status:
+ *                  type: string
+ *                  example: success
+ *                message:
+ *                  type: string
+ *                  example: get all posts successfully
  *                data:
- *                  type: object
- *                  properties:
- *                    data:
- *                      type: array
- *                      items:
- *                        $ref: '#/components/schemas/Post'
- *                    meta:
- *                      $ref: '#/components/schemas/Meta'
+ *                  type: array
+ *                  items:
+ *                    $ref: '#/components/schemas/Post'
+ *                  meta:
+ *                    $ref: '#/components/schemas/Meta'
  *       '400':
  *        description: Bad Request
  *       '500':
  *        description: Internal Server Error
  */
 router.get('/', async (req, res) => {
-  const { data, message, error } = await PostController.getAllPosts(req.query);
-  if (error) HttpResponseHandler.InternalServerError(res);
-  HttpResponseHandler.Success(res, data, message);
+  const { data, message, errors, status, meta } =
+    await PostController.getAllPosts(req.query);
+  if (errors) HttpResponseHandler.InternalServerError(res, errors, status);
+  HttpResponseHandler.Success(res, data, message, status, meta);
 });
 
 /**
@@ -74,6 +78,12 @@ router.get('/', async (req, res) => {
  *            schema:
  *              type: object
  *              properties:
+ *                status:
+ *                  type: string
+ *                  example: success
+ *                message:
+ *                  type: string
+ *                  example: get detail post successfully
  *                data:
  *                  $ref: '#/components/schemas/Post'
  *       '400':
@@ -84,10 +94,14 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
   if (!id) return HttpResponseHandler.BadRequest(res);
-  const { data, message, error } = await PostController.getDetailPost(id);
-  if (error) return HttpResponseHandler.InternalServerError(res);
-  if (!data) return HttpResponseHandler.NotFound(res);
-  HttpResponseHandler.Success(res, data, message);
+  const { data, message, errors, status } =
+    await PostController.getDetailPost(id);
+  if (errors) {
+    if (errors.status === 404)
+      return HttpResponseHandler.NotFound(res, errors, status);
+    return HttpResponseHandler.InternalServerError(res, errors, status);
+  }
+  HttpResponseHandler.Success(res, data, message, status);
 });
 
 /**
@@ -102,14 +116,23 @@ router.get('/:id', async (req, res) => {
  *      content:
  *        application/json:
  *          schema:
- *            $ref: '#/components/schemas/Post'
+ *            $ref: '#/components/schemas/PostBody'
  *    responses:
  *       '200':
  *        description: Success
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/Post'
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: string
+ *                  example: success
+ *                message:
+ *                  type: string
+ *                  example: create post successfully
+ *                data:
+ *                  $ref: '#/components/schemas/Post'
  *       '400':
  *        description: Bad Request
  *       '500':
@@ -133,15 +156,18 @@ router.post(
     'user_id',
   ]),
   async (req, res) => {
-    const { data, message, error } = await PostController.createPost(req.body);
-    if (error) return HttpResponseHandler.InternalServerError(res, message);
-    HttpResponseHandler.Success(res, data);
+    const { data, message, errors, status } = await PostController.createPost(
+      req.body
+    );
+    if (errors)
+      return HttpResponseHandler.InternalServerError(res, errors, status);
+    HttpResponseHandler.Success(res, data, message, status);
   }
 );
 
 /**
  * @openapi
- * /api/v1/post/update/{id}:
+ * /api/v1/post/{id}/update:
  *  patch:
  *    tags:
  *      - Post
@@ -150,13 +176,28 @@ router.post(
  *      - in: path
  *        name: id
  *        required: true
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            $ref: '#/components/schemas/PostBody'
  *    responses:
  *       '200':
  *        description: Success
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/Post'
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: string
+ *                  example: success
+ *                message:
+ *                  type: string
+ *                  example: update post successfully
+ *                data:
+ *                  $ref: '#/components/schemas/Post'
  *       '400':
  *        description: Bad Request
  *       '500':
@@ -164,17 +205,21 @@ router.post(
  *    security:
  *      - bearerAuth: []
  */
-router.patch('/update/:id', checkLogin, (req, res) => {
+router.patch('/:id/update', checkLogin, async (req, res) => {
   const { id } = req.params;
   if (!id) return HttpResponseHandler.BadRequest(res);
-  const { data, message, error } = PostController.updatePost(id, req.body);
-  if (error) return HttpResponseHandler.InternalServerError(res);
-  HttpResponseHandler.Success(res, data, message);
+  const { data, message, errors, status } = await PostController.updatePost(
+    id,
+    req.body
+  );
+  if (errors)
+    return HttpResponseHandler.InternalServerError(res, errors, status);
+  HttpResponseHandler.Success(res, data, message, status);
 });
 
 /**
  * @openapi
- * /api/v1/post/delete/{id}:
+ * /api/v1/post/{id}/delete:
  *  delete:
  *    tags:
  *      - Post
@@ -191,7 +236,13 @@ router.patch('/update/:id', checkLogin, (req, res) => {
  *            schema:
  *              type: object
  *              properties:
- *                _id:
+ *                status:
+ *                  type: string
+ *                  example: success
+ *                message:
+ *                  type: string
+ *                  example: delete post successfully
+ *                data:
  *                  type: string
  *       '400':
  *        description: Bad Request
@@ -200,12 +251,13 @@ router.patch('/update/:id', checkLogin, (req, res) => {
  *    security:
  *      - bearerAuth: []
  */
-router.delete('/delete/:id', checkLogin, (req, res) => {
+router.delete('/:id/delete', checkLogin, async (req, res) => {
   const { id } = req.params;
   if (!id) return HttpResponseHandler.BadRequest(res);
-  const { data, message, error } = PostController.deletePost(id);
-  if (error) return HttpResponseHandler.InternalServerError(res);
-  HttpResponseHandler.Success(res, data, message);
+  const { data, message, errors, status } = await PostController.deletePost(id);
+  if (errors)
+    return HttpResponseHandler.InternalServerError(res, errors, status);
+  HttpResponseHandler.Success(res, data, message, status);
 });
 
 module.exports = router;

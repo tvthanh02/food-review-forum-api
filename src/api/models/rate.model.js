@@ -6,14 +6,17 @@ const rateSchema = new mongoose.Schema(
       type: Number,
       min: 1,
       max: 5,
+      required: true,
     },
     post_id: {
       type: mongoose.Types.ObjectId,
       ref: 'Post',
+      required: true,
     },
     user_id: {
       type: mongoose.Types.ObjectId,
       ref: 'User',
+      required: true,
     },
   },
   {

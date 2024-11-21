@@ -6,15 +6,18 @@ const reportSchema = new mongoose.Schema(
     report_type_id: {
       type: [mongoose.Types.ObjectId],
       ref: 'ReportType',
+      required: true,
     },
     note: String,
     post_id: {
       type: mongoose.Types.ObjectId,
       ref: 'Post',
+      required: true,
     },
     user_id: {
       type: mongoose.Types.ObjectId,
       ref: 'User',
+      required: true,
     },
     status: {
       type: String,

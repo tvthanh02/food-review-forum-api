@@ -1,11 +1,12 @@
-const { getSearchQueries } = require('../helpers');
+const { MODE_SEARCH } = require('../../constants');
+const { getSearchQueries, createResponse } = require('../helpers');
 const Category = require('../models/category.model');
 class CategoryController {
   static async getAllCategories(searchQueries) {
     const { page = 1, limit = 20, status } = searchQueries;
 
     const queries = getSearchQueries([
-      { fieldName: 'status', searchValue: status },
+      { fieldName: 'status', searchValue: status, mode: MODE_SEARCH.EXACT },
     ]);
 
     try {
@@ -13,22 +14,25 @@ class CategoryController {
         .skip((page - 1) * limit)
         .limit(limit)
         .exec();
-      return {
-        data: {
-          data: categories,
-          meta: {
-            total: categories.length,
-            currentPage: +page,
-            totalPages: Math.ceil(categories.length / limit),
-          },
-        },
-      };
+
+      return createResponse(
+        'success',
+        'Get all categories successfully',
+        categories,
+        null,
+        {
+          total: categories.length ?? 0,
+          currentPage: +page,
+          totalPages: Math.ceil(categories.length / limit) ?? 0,
+        }
+      );
     } catch (error) {
-      return {
-        data: [],
-        message: error.message,
-        error: 1,
-      };
+      return createResponse('error', null, null, {
+        status: 500,
+        title: 'Have error when get all categories',
+        detail: error.message,
+        source: 'controller/category/getAllCategories',
+      });
     }
   }
 
@@ -37,32 +41,48 @@ class CategoryController {
       const category = await Category.create({
         category_name: data.category_name,
         description: data.description ? data.description : '',
+        status: data.status,
       });
-      category.save();
-      return {
-        data: category,
-      };
+      return createResponse(
+        'success',
+        'Create category successfully',
+        category,
+        null
+      );
     } catch (error) {
-      return {
-        data: null,
-        message: error.message,
-        error: 1,
-      };
+      return createResponse('error', null, null, {
+        status: 500,
+        title: 'Have error when create category',
+        detail: error.message,
+        source: 'controller/category/createCategory',
+      });
     }
   }
 
   static async getDetailCategory(categoryId) {
     try {
       const data = await Category.findById(categoryId).exec();
-      return {
+      if (!data)
+        return createResponse('error', null, null, {
+          status: 404,
+          title: 'Category not exist',
+          detail: 'Category is not exist',
+          source: 'controller/category/getDetailCategory',
+        });
+
+      return createResponse(
+        'success',
+        'Get detail category successfully',
         data,
-      };
+        null
+      );
     } catch (error) {
-      return {
-        data: null,
-        message: error.message,
-        error: 1,
-      };
+      return createResponse('error', null, null, {
+        status: 500,
+        title: 'Have error when get detail category',
+        detail: error.message,
+        source: 'controller/category/getDetailCategory',
+      });
     }
   }
 
@@ -72,30 +92,57 @@ class CategoryController {
         new: true,
         runValidators: true,
       }).exec();
-      return {
-        data: category,
-      };
+
+      if (!category) {
+        return createResponse('error', null, null, {
+          status: 404,
+          title: 'Category not exist',
+          detail: 'Category is not exist',
+          source: 'controller/category/updateCategory',
+        });
+      }
+
+      return createResponse(
+        'success',
+        'Update category successfully',
+        category,
+        null
+      );
     } catch (error) {
-      return {
-        data: null,
-        message: error.message,
-        error: 1,
-      };
+      return createResponse('error', null, null, {
+        status: 500,
+        title: 'Have error when update category',
+        detail: error.message,
+        source: 'controller/category/updateCategory',
+      });
     }
   }
 
   static async deleteCategory(categoryId) {
     try {
       const category = await Category.findByIdAndDelete(categoryId).exec();
-      return {
-        data: category._id,
-      };
+
+      if (!category)
+        return createResponse('error', null, null, {
+          status: 404,
+          title: 'Category not exist',
+          detail: 'Category is not exist',
+          source: 'controller/category/deleteCategory',
+        });
+
+      return createResponse(
+        'success',
+        'Delete category successfully',
+        category._id,
+        null
+      );
     } catch (error) {
-      return {
-        data: null,
-        message: error.message,
-        error: 1,
-      };
+      return createResponse('error', null, null, {
+        status: 500,
+        title: 'Have error when delete category',
+        detail: error.message,
+        source: 'controller/category/deleteCategory',
+      });
     }
   }
 }

@@ -1,14 +1,13 @@
-const { PAGE, LIMIT } = require('../../constants');
-const { getSearchQueries } = require('../helpers');
+const { PAGE, LIMIT, MODE_SEARCH } = require('../../constants');
+const { getSearchQueries, createResponse } = require('../helpers');
 const Report = require('../models/report.model');
 class ReportController {
   static async getAllReports(searchQueries) {
     const { page = PAGE, limit = LIMIT, status } = searchQueries;
 
     const queries = getSearchQueries([
-      { fieldName: 'status', searchValue: status },
+      { fieldName: 'status', searchValue: status, mode: MODE_SEARCH.EXACT },
     ]);
-
     try {
       const reports = await Report.find(queries)
         .populate('user_id', 'user_name avatar')
@@ -18,30 +17,24 @@ class ReportController {
         .skip((page - 1) * limit)
         .limit(limit)
         .exec();
-      return {
-        data: {
-          data: reports.map((report) => ({
-            _id: report._id,
-            note: report.note,
-            post: report.post_id,
-            user: report.user_id,
-            report_content: report.report_type_id,
-            created_at: report.created_at,
-            updated_at: report.updated_at,
-          })),
-          meta: {
-            total: reports.length,
-            currentPage: +page,
-            totalPages: Math.ceil(reports.length / limit),
-          },
-        },
-      };
+      return createResponse(
+        'success',
+        'Get all reports successfully',
+        reports,
+        null,
+        {
+          total: reports?.length ?? 0,
+          currentPage: +page,
+          totalPages: Math.ceil(reports?.length / limit) ?? 0,
+        }
+      );
     } catch (error) {
-      return {
-        data: [],
-        message: error.message,
-        error: 1,
-      };
+      return createResponse('error', null, null, {
+        status: 500,
+        title: 'Have error when get all reports',
+        detail: error.message,
+        source: 'controller/report/getAllReports',
+      });
     }
   }
   static async createReport(data) {
@@ -52,16 +45,38 @@ class ReportController {
         report_type_id,
         user_id: uid,
       });
-      await report.save();
-      return {
-        data: report,
-      };
+      return createResponse(
+        'success',
+        'Create report successfully',
+        report,
+        null
+      );
     } catch (error) {
-      return {
-        data: null,
-        message: error.message,
-        error: 1,
-      };
+      return createResponse('error', null, null, {
+        status: 500,
+        title: 'Have error when create report',
+        detail: error.message,
+        source: 'controller/report/createReport',
+      });
+    }
+  }
+
+  static async updateReportStatus(reportId, status) {
+    try {
+      const report = await Report.findByIdAndUpdate(reportId, { status });
+      return createResponse(
+        'success',
+        'Update report status successfully',
+        report,
+        null
+      );
+    } catch (error) {
+      return createResponse('error', null, null, {
+        status: 500,
+        title: 'Have error when update report status',
+        detail: error.message,
+        source: 'controller/report/updateReportStatus',
+      });
     }
   }
 }

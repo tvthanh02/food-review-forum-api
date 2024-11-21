@@ -29,24 +29,34 @@ const UserController = require('../controllers/user.controller');
  *              $ref: '#/components/schemas/ResponseLogin'
  *       '400':
  *        description: Bad Request
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/ResponseErrorBadRequest'
  *       '500':
  *        description: Internal Server Error
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/ResponseErrorInternalServer'
  */
 router.post(
   '/login',
   checkBadRequest(['email', 'password']),
   async (req, res) => {
     const { email, password } = req.body;
-    const { data, message, error } = await AuthController.login(
+    const { data, message, errors, status } = await AuthController.login(
       email,
       password
     );
 
-    if (error) {
-      return HttpResponseHandler.InternalServerError(res, message);
+    if (errors) {
+      if (errors.status === 404)
+        return HttpResponseHandler.NotFound(res, errors, status);
+      return HttpResponseHandler.InternalServerError(res, errors);
     }
 
-    HttpResponseHandler.Success(res, data);
+    HttpResponseHandler.Success(res, data, message, status);
   }
 );
 
@@ -69,7 +79,16 @@ router.post(
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/ResponseRegister'
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: string
+ *                  example: success
+ *                message:
+ *                  type: string
+ *                  example: registered
+ *                data:
+ *                  $ref: '#/components/schemas/UserInfo'
  *       '400':
  *        description: Bad Request
  *       '500':
@@ -77,19 +96,20 @@ router.post(
  */
 router.post(
   '/register',
-  checkBadRequest(['email', 'password']),
+  checkBadRequest(['user_name', 'email', 'password']),
   async (req, res) => {
-    const { email, password } = req.body;
-    const { data, message, error } = await AuthController.register(
+    const { email, password, user_name } = req.body;
+    const { data, message, errors, status } = await AuthController.register(
       email,
-      password
+      password,
+      user_name
     );
 
-    if (error) {
-      return HttpResponseHandler.InternalServerError(res, message);
+    if (errors) {
+      return HttpResponseHandler.InternalServerError(res, errors, status);
     }
 
-    HttpResponseHandler.Success(res, data);
+    HttpResponseHandler.Success(res, data, message, status);
   }
 );
 
@@ -119,9 +139,19 @@ router.post(
  *            schema:
  *              type: object
  *              properties:
+ *                status:
+ *                  type: string
+ *                  example: success
  *                message:
  *                  type: string
  *                  example: logged out
+ *                data:
+ *                  type: object
+ *                  properties:
+ *                    accessToken:
+ *                      type: string
+ *                    refreshToken:
+ *                      type: string
  *       '401':
  *        description: Unauthorized
  *       '400':
@@ -167,7 +197,13 @@ router.post(
  *            schema:
  *              type: object
  *              properties:
- *               data:
+ *                status:
+ *                  type: string
+ *                  example: success
+ *                message:
+ *                  type: string
+ *                  example: get profile successfully
+ *                data:
  *                  $ref: '#/components/schemas/Profile'
  *       '400':
  *        description: Bad Request
@@ -208,8 +244,17 @@ router.get('/profile', checkLogin, async (req, res) => {
  *            schema:
  *              type: object
  *              properties:
- *                accessToken:
+ *                status:
  *                  type: string
+ *                  example: success
+ *                message:
+ *                  type: string
+ *                  example: refreshed
+ *                data:
+ *                  type: object
+ *                  properties:
+ *                    accessToken:
+ *                      type: string
  *       '400':
  *        description: Bad Request
  *       '500':

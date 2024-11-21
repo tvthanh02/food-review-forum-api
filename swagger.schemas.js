@@ -17,10 +17,19 @@
  *     ResponseLogin:
  *       type: object
  *       properties:
- *         accessToken:
+ *         status:
  *           type: string
- *         refreshToken:
+ *           example: success
+ *         message:
  *           type: string
+ *           example: logged in
+ *         data:
+ *           type: object
+ *           properties:
+ *             accessToken:
+ *               type: string
+ *             refreshToken:
+ *               type: string
  *     UserInfo:
  *       type: object
  *       properties:
@@ -29,6 +38,10 @@
  *         email:
  *           type: string
  *           format: email
+ *         avatar:
+ *           type: string
+ *         user_name:
+ *           type: string
  *     Profile:
  *       type: object
  *       properties:
@@ -45,6 +58,14 @@
  *           type: array
  *           items:
  *             type: string
+ *         role:
+ *           type: string
+ *           enum: ["admin", "user", "subadmin"]
+ *         isLock:
+ *           type: boolean
+ *         subadmin_status:
+ *           type: string
+ *           enum: ['Active', 'Pending', 'Suspended', 'Rejected']
  *         bio:
  *           type: string
  *         created_at:
@@ -61,6 +82,8 @@
  *         category_name:
  *           type: string
  *         description:
+ *           type: string
+ *         status:
  *           type: string
  *         created_at:
  *           type: string
@@ -80,10 +103,14 @@
  *     ResponseRegister:
  *       type: object
  *       properties:
+ *         status:
+ *           type: string
  *         message:
  *           type: string
- *         result:
- *           $ref: '#/components/schemas/UserInfo'
+ *         data:
+ *           type: object
+ *           schema:
+ *             $ref: '#/components/schemas/UserInfo'
  *     Post:
  *       type: object
  *       properties:
@@ -132,6 +159,44 @@
  *         updated_at:
  *           type: string
  *           format: date-time
+ *     PostBody:
+ *       type: object
+ *       properties:
+ *         position:
+ *           type: string
+ *         food_name:
+ *           type: string
+ *         user_id:
+ *           type: string
+ *           format: ObjectId
+ *         province:
+ *           type: string
+ *         maps:
+ *           type: object
+ *           properties:
+ *             latitude:
+ *               type: number
+ *             longitude:
+ *               type: number
+ *         description:
+ *           type: string
+ *         thumbnail:
+ *           type: string
+ *         images:
+ *           type: array
+ *           items:
+ *             type: string
+ *         videos:
+ *           type: array
+ *           items:
+ *             type: string
+ *         hashtags:
+ *           type: string
+ *         categories:
+ *           type: array
+ *           items:
+ *             type: string
+ *             format: ObjectId
  *     Rate:
  *       type: object
  *       properties:
@@ -145,6 +210,17 @@
  *         user_id:
  *           type: string
  *           format: ObjectId
+ *         user_info:
+ *           type: object
+ *           properties:
+ *             _id:
+ *               type: string
+ *             user_name:
+ *               type: string
+ *             avatar:
+ *               type: string
+ *             email:
+ *               type: string
  *         created_at:
  *           type: string
  *           format: date-time
@@ -224,10 +300,117 @@
  *           type: array
  *           items:
  *             type: string
+ *         status:
+ *           type: string
  *         created_at:
  *           type: string
  *           format: date-time
  *         updated_at:
  *           type: string
  *           format: date-time
+ *     ResponseErrorInternalServer:
+ *       type: object
+ *       properties:
+ *         status:
+ *           type: string
+ *           example: error
+ *         errors:
+ *           type: object
+ *           properties:
+ *             status:
+ *               type: number
+ *               example: 500
+ *             title:
+ *               type: string
+ *               example: Internal Server Error
+ *             detail:
+ *               type: string
+ *               example: Internal Server Error
+ *             source:
+ *               type: string
+ *               example: /path/
+ *     ResponseErrorBadRequest:
+ *       type: object
+ *       properties:
+ *         status:
+ *           type: string
+ *           example: error
+ *         errors:
+ *           type: object
+ *           properties:
+ *             status:
+ *               type: number
+ *               example: 400
+ *             title:
+ *               type: string
+ *               example: Bad Request
+ *             detail:
+ *               type: string
+ *               example: Invalid anything
+ *             source:
+ *               type: string
+ *               example: /path/
+ *     ResponseErrorNotFound:
+ *       type: object
+ *       properties:
+ *         status:
+ *           type: string
+ *           example: error
+ *         errors:
+ *           type: object
+ *           properties:
+ *             status:
+ *               type: number
+ *               example: 404
+ *             title:
+ *               type: string
+ *               example: Not Found
+ *             detail:
+ *               type: string
+ *               example: Not Found
+ *             source:
+ *               type: string
+ *               example: /path/
+ *     ResponseErrorUnauthorized:
+ *       type: object
+ *       properties:
+ *         status:
+ *           type: string
+ *           example: error
+ *         errors:
+ *           type: object
+ *           properties:
+ *             status:
+ *               type: number
+ *               example: 401
+ *             title:
+ *               type: string
+ *               example: Unauthorized
+ *             detail:
+ *               type: string
+ *               example: Unauthorized
+ *             source:
+ *               type: string
+ *               example: /path/
+ *     ResponseErrorForbidden:
+ *       type: object
+ *       properties:
+ *         status:
+ *           type: string
+ *           example: error
+ *         errors:
+ *           type: object
+ *           properties:
+ *             status:
+ *               type: number
+ *               example: 403
+ *             title:
+ *               type: string
+ *               example: Forbidden
+ *             detail:
+ *               type: string
+ *               example: Forbidden
+ *             source:
+ *               type: string
+ *               example: /path/
  */

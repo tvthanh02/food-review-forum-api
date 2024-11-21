@@ -1,4 +1,5 @@
 const Comment = require('../models/comment.model');
+const { createResponse } = require('../helpers');
 class CommentController {
   static async getCommentByPostId(postId) {
     try {
@@ -16,15 +17,19 @@ class CommentController {
         }).exec();
         result.push({ comment, replies });
       }
-      return {
-        data: result,
-      };
+      return createResponse(
+        'success',
+        'Get comments successfully',
+        result,
+        null
+      );
     } catch (error) {
-      return {
-        data: [],
-        message: error.message,
-        error: 1,
-      };
+      return createResponse('error', null, null, {
+        status: 500,
+        title: 'Have error when get comments',
+        detail: error.message,
+        source: 'controller/comment/getCommentByPostId',
+      });
     }
   }
   static async getReplyByCommentId(commentId) {
@@ -34,30 +39,38 @@ class CommentController {
         .populate('reply_to_user', 'user_name avatar')
         .sort({ created_at: 1 })
         .exec();
-      return {
-        data: comments,
-      };
+      return createResponse(
+        'success',
+        'Get comments successfully',
+        comments,
+        null
+      );
     } catch (error) {
-      return {
-        data: [],
-        message: error.message,
-        error: 1,
-      };
+      return createResponse('error', null, null, {
+        status: 500,
+        title: 'Have error when get comments',
+        detail: error.message,
+        source: 'controller/comment/getReplyByCommentId',
+      });
     }
   }
 
   static async createComment(data) {
     try {
       const comment = await Comment.create(data);
-      return {
-        data: comment,
-      };
+      return createResponse(
+        'success',
+        'Create comment successfully',
+        comment,
+        null
+      );
     } catch (error) {
-      return {
-        data: null,
-        message: error.message,
-        error: 1,
-      };
+      return createResponse('error', null, null, {
+        status: 500,
+        title: 'Have error when create comment',
+        detail: error.message,
+        source: 'controller/comment/createComment',
+      });
     }
   }
 
@@ -67,30 +80,39 @@ class CommentController {
         new: true,
         runValidators: true,
       }).exec();
-      return {
-        data: comment,
-      };
+      return createResponse(
+        'success',
+        'Update comment successfully',
+        comment,
+        null
+      );
     } catch (error) {
-      return {
-        data: null,
-        message: error.message,
-        error: 1,
-      };
+      return createResponse('error', null, null, {
+        status: 500,
+        title: 'Have error when update comment',
+        detail: error.message,
+        source: 'controller/comment/updateComment',
+      });
     }
   }
 
   static async deleteComment(commentId) {
     try {
       const comment = await Comment.findByIdAndDelete(commentId).exec();
-      return {
-        data: comment._id,
-      };
+
+      return createResponse(
+        'success',
+        'Delete comment successfully',
+        comment._id,
+        null
+      );
     } catch (error) {
-      return {
-        data: null,
-        message: error.message,
-        error: 1,
-      };
+      return createResponse('error', null, null, {
+        status: 500,
+        title: 'Have error when delete comment',
+        detail: error.message,
+        source: 'controller/comment/deleteComment',
+      });
     }
   }
 }

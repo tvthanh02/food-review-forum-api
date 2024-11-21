@@ -1,19 +1,19 @@
 const Rate = require('../models/rate.model');
+const { createResponse } = require('../helpers');
 class RateController {
   static async getRateByPostId(postId) {
     try {
       const rates = await Rate.find({ post_id: postId })
         .populate('user_info', 'user_name avatar')
         .exec();
-      return {
-        data: rates,
-      };
+      return createResponse('success', 'Get rates successfully', rates, null);
     } catch (error) {
-      return {
-        data: null,
-        message: error.message,
-        error: 1,
-      };
+      return createResponse('error', null, null, {
+        status: 500,
+        title: 'Have error when get rates',
+        detail: error.message,
+        source: 'controller/rate/getRateByPostId',
+      });
     }
   }
 
@@ -24,16 +24,19 @@ class RateController {
         post_id: postId,
         user_id: userId,
       });
-      await newRate.save();
-      return {
-        data: newRate,
-      };
+      return createResponse(
+        'success',
+        'Create rate successfully',
+        newRate,
+        null
+      );
     } catch (error) {
-      return {
-        data: null,
-        message: error.message,
-        error: 1,
-      };
+      return createResponse('error', null, null, {
+        status: 500,
+        title: 'Have error when create rate',
+        detail: error.message,
+        source: 'controller/rate/createRate',
+      });
     }
   }
 }

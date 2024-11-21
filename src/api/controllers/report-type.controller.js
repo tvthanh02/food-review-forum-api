@@ -1,12 +1,12 @@
-const { PAGE, LIMIT } = require('../../constants');
-const { getSearchQueries } = require('../helpers');
+const { PAGE, LIMIT, MODE_SEARCH } = require('../../constants');
+const { getSearchQueries, createResponse } = require('../helpers');
 const ReportType = require('../models/report-type.model');
 class ReportTypeController {
   static async getAllReportTypes(searchQueries) {
     const { page = PAGE, limit = LIMIT, status } = searchQueries;
 
     const queries = getSearchQueries([
-      { fieldName: 'status', searchValue: status },
+      { fieldName: 'status', searchValue: status, mode: MODE_SEARCH.EXACT },
     ]);
 
     try {
@@ -14,36 +14,50 @@ class ReportTypeController {
         .skip((page - 1) * limit)
         .limit(limit)
         .exec();
-      return {
-        data: {
-          data: reportTypes,
-          meta: {
-            total: reportTypes.length,
-            currentPage: +page,
-            totalPages: Math.ceil(reportTypes.length / limit),
-          },
-        },
-      };
+      return createResponse(
+        'success',
+        'Get all report types successfully',
+        reportTypes,
+        null,
+        {
+          total: reportTypes.length,
+          currentPage: +page,
+          totalPages: Math.ceil(reportTypes.length / limit),
+        }
+      );
     } catch (error) {
-      return {
-        data: [],
-        message: error.message,
-        error: 1,
-      };
+      return createResponse('error', null, null, {
+        status: 500,
+        title: 'Have error when get all report types',
+        detail: error.message,
+        source: 'controller/report-type/getAllReportTypes',
+      });
     }
   }
   static async getReportTypeDetail(id) {
     try {
       const reportType = await ReportType.findById(id).exec();
-      return {
-        data: reportType,
-      };
+      if (!reportType) {
+        return createResponse('error', null, null, {
+          status: 404,
+          title: 'Report type not found',
+          detail: 'Report type not found',
+          source: 'controller/report-type/getReportTypeDetail',
+        });
+      }
+      return createResponse(
+        'success',
+        'Get report type detail successfully',
+        reportType,
+        null
+      );
     } catch (error) {
-      return {
-        data: null,
-        message: error.message,
-        error: 1,
-      };
+      return createResponse('error', null, null, {
+        status: 500,
+        title: 'Have error when get report type detail',
+        detail: error.message,
+        source: 'controller/report-type/getReportTypeDetail',
+      });
     }
   }
   static async createReportType({ name, status }) {
@@ -52,16 +66,19 @@ class ReportTypeController {
         name,
         status,
       });
-      await reportType.save();
-      return {
-        data: reportType,
-      };
+      return createResponse(
+        'success',
+        'Create report type successfully',
+        reportType,
+        null
+      );
     } catch (error) {
-      return {
-        data: null,
-        message: error.message,
-        error: 1,
-      };
+      return createResponse('error', null, null, {
+        status: 500,
+        title: 'Have error when create report type',
+        detail: error.message,
+        source: 'controller/report-type/createReportType',
+      });
     }
   }
 
@@ -69,15 +86,19 @@ class ReportTypeController {
     try {
       const reportType =
         await ReportType.findByIdAndDelete(reportTypeId).exec();
-      return {
-        data: reportType._id,
-      };
+      return createResponse(
+        'success',
+        'Delete report type successfully',
+        reportType._id,
+        null
+      );
     } catch (error) {
-      return {
-        data: null,
-        message: error.message,
-        error: 1,
-      };
+      return createResponse('error', null, null, {
+        status: 500,
+        title: 'Have error when delete report type',
+        detail: error.message,
+        source: 'controller/report-type/deleteReportType',
+      });
     }
   }
 
@@ -97,15 +118,19 @@ class ReportTypeController {
           runValidators: true,
         }
       ).exec();
-      return {
-        data: reportType,
-      };
+      return createResponse(
+        'success',
+        'Update report type successfully',
+        reportType,
+        null
+      );
     } catch (error) {
-      return {
-        data: null,
-        message: error.message,
-        error: 1,
-      };
+      return createResponse('error', null, null, {
+        status: 500,
+        title: 'Have error when update report type',
+        detail: error.message,
+        source: 'controller/report-type/updateReportType',
+      });
     }
   }
 }
