@@ -3,14 +3,16 @@ const { getSearchQueries, createResponse } = require('../helpers');
 const ReportType = require('../models/report-type.model');
 class ReportTypeController {
   static async getAllReportTypes(searchQueries) {
-    const { page = PAGE, limit = LIMIT, status } = searchQueries;
+    const { page = PAGE, limit = LIMIT, status, name } = searchQueries;
 
     const queries = getSearchQueries([
       { fieldName: 'status', searchValue: status, mode: MODE_SEARCH.EXACT },
+      { fieldName: 'name', searchValue: name, mode: MODE_SEARCH.CONTAIN },
     ]);
 
     try {
       const reportTypes = await ReportType.find(queries)
+        .sort({ created_at: -1 })
         .skip((page - 1) * limit)
         .limit(limit)
         .exec();

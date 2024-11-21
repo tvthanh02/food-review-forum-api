@@ -3,10 +3,26 @@ const { getSearchQueries, createResponse } = require('../helpers');
 const Report = require('../models/report.model');
 class ReportController {
   static async getAllReports(searchQueries) {
-    const { page = PAGE, limit = LIMIT, status } = searchQueries;
+    const {
+      page = PAGE,
+      limit = LIMIT,
+      status,
+      report_type_id,
+      user_id,
+    } = searchQueries;
 
     const queries = getSearchQueries([
       { fieldName: 'status', searchValue: status, mode: MODE_SEARCH.EXACT },
+      {
+        fieldName: 'report_type_id',
+        searchValue: report_type_id,
+        mode: MODE_SEARCH.IN,
+      },
+      {
+        fieldName: 'user_id',
+        searchValue: user_id,
+        mode: MODE_SEARCH.EXACT,
+      },
     ]);
     try {
       const reports = await Report.find(queries)

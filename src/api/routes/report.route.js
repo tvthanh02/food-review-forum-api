@@ -36,6 +36,15 @@ const HttpResponseHandler = require('../helpers/response-handler.helper');
  *          type: string
  *          enum: ['Pending', 'Resolved', 'Closed']
  *          required: false
+ *      - in: query
+ *        name: report_type_id
+ *        schema:
+ *          type: string
+ *          required: false
+ *      - in: query
+ *        name: user_id
+ *        schema:
+ *          type: string
  *    responses:
  *       '200':
  *        description: Success

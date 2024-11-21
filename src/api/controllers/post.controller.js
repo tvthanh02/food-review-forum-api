@@ -1,11 +1,28 @@
 const Post = require('../models/post.model');
-const { createResponse } = require('../helpers');
+const { createResponse, getSearchQueries } = require('../helpers');
+const { MODE_SEARCH } = require('../../constants');
 
 class PostController {
   static async getAllPosts(queries) {
-    const { page = 1, limit = 20 } = queries;
+    const {
+      page = 1,
+      limit = 20,
+      status,
+      category,
+      food_name,
+      province,
+      user_id,
+    } = queries;
+    const queriesSearch = getSearchQueries([
+      { key: 'status', value: status, mode: MODE_SEARCH.EXACT },
+      { key: 'category', value: category, mode: MODE_SEARCH.IN },
+      { key: 'food_name', value: food_name, mode: MODE_SEARCH.CONTAIN },
+      { key: 'province', value: province, mode: MODE_SEARCH.CONTAIN },
+      { key: 'user_id', value: user_id, mode: MODE_SEARCH.EXACT },
+    ]);
     try {
-      const posts = await Post.find()
+      const posts = await Post.find(queriesSearch)
+        .sort({ created_at: -1 })
         .skip((page - 1) * limit)
         .limit(limit)
         .exec();
@@ -93,6 +110,27 @@ class PostController {
         title: 'Have error when update post',
         detail: error.message,
         source: 'controller/post/updatePost',
+      });
+    }
+  }
+
+  static async updatePostStatus(postId, status) {
+    try {
+      const post = await Post.findByIdAndUpdate(
+        postId,
+        { status },
+        {
+          new: true,
+          runValidators: true,
+        }
+      ).exec();
+      return createResponse('success', 'Update post successfully', post, null);
+    } catch (error) {
+      return createResponse('error', null, null, {
+        status: 500,
+        title: 'Have error when update post',
+        detail: error.message,
+        source: 'controller/post/updatePostStatus',
       });
     }
   }

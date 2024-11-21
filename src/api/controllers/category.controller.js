@@ -3,14 +3,16 @@ const { getSearchQueries, createResponse } = require('../helpers');
 const Category = require('../models/category.model');
 class CategoryController {
   static async getAllCategories(searchQueries) {
-    const { page = 1, limit = 20, status } = searchQueries;
+    const { page = 1, limit = 20, status, name } = searchQueries;
 
     const queries = getSearchQueries([
       { fieldName: 'status', searchValue: status, mode: MODE_SEARCH.EXACT },
+      { fieldName: 'category_name', searchValue: name },
     ]);
 
     try {
       const categories = await Category.find(queries)
+        .sort({ created_at: -1 })
         .skip((page - 1) * limit)
         .limit(limit)
         .exec();

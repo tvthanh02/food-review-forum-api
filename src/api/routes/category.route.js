@@ -33,6 +33,10 @@ const { checkBadRequest } = require('../middlewares/common.middleware');
  *          type: string
  *          enum: ['Active', 'Inactive']
  *          required: false
+ *      - in: query
+ *        name: name
+ *        schema:
+ *          type: string
  *    responses:
  *       '200':
  *        description: Success

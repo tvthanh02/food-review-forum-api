@@ -31,6 +31,10 @@ const HttpResponseHandler = require('../helpers/response-handler.helper');
  *          type: string
  *          enum: ['Active', 'Inactive']
  *          required: false
+ *      - in: query
+ *        name: name
+ *        schema:
+ *          type: string
  *    responses:
  *       '200':
  *        description: Success

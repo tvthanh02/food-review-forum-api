@@ -17,6 +17,9 @@ module.exports = {
           case MODE_SEARCH.CONTAIN:
             queries[fieldName] = { $regex: searchValue, $options: 'i' };
             break;
+          case MODE_SEARCH.IN:
+            queries[fieldName] = { $in: [searchValue] };
+            break;
           default:
             break;
         }

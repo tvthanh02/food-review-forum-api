@@ -6,19 +6,28 @@ class UserController {
     const {
       page = 1,
       limit = 20,
-      role = '',
-      name = '',
-      email = '',
+      role,
+      name,
+      email,
+      isLock,
+      subadmin_status,
     } = searchQueries;
 
     const queries = getSearchQueries([
       { fieldName: 'role', searchValue: role, mode: MODE_SEARCH.EXACT },
       { fieldName: 'user_name', searchValue: name },
       { fieldName: 'email', searchValue: email, mode: MODE_SEARCH.EXACT },
+      { fieldName: 'isLock', searchValue: isLock, mode: MODE_SEARCH.EXACT },
+      {
+        fieldName: 'subadmin_status',
+        searchValue: subadmin_status,
+        mode: MODE_SEARCH.EXACT,
+      },
     ]);
 
     try {
       const listUsers = await User.find(queries)
+        .sort({ createdAt: -1 })
         .skip((page - 1) * limit)
         .limit(limit)
         .exec();
