@@ -166,9 +166,6 @@
  *           type: string
  *         food_name:
  *           type: string
- *         user_id:
- *           type: string
- *           format: ObjectId
  *         province:
  *           type: string
  *         maps:

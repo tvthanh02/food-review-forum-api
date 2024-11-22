@@ -173,18 +173,15 @@ router.post(
     'position',
     'food_name',
     'province',
-    'maps',
-    'description',
-    'images',
-    'videos',
     'thumbnail',
     'categories',
-    'user_id',
   ]),
   async (req, res) => {
-    const { data, message, errors, status } = await PostController.createPost(
-      req.body
-    );
+    const { uid } = req.payload;
+    const { data, message, errors, status } = await PostController.createPost({
+      ...req.body,
+      user_id: uid,
+    });
     if (errors)
       return HttpResponseHandler.InternalServerError(res, errors, status);
     HttpResponseHandler.Success(res, data, message, status);

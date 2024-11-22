@@ -11,7 +11,13 @@ const wishlistSchema = new mongoose.Schema(
       ref: 'Post',
     },
   },
-  { toJSON: { virtuals: true }, timestamps: true }
+  {
+    toJSON: { virtuals: true },
+    timestamps: {
+      createdAt: 'created_at',
+      updatedAt: 'updated_at',
+    },
+  }
 );
 
 wishlistSchema.virtual('post_info', {

@@ -79,8 +79,6 @@ class PostController {
     try {
       const post = await Post.create({
         ...data,
-        maps: JSON.parse(data?.maps ?? {}),
-        categories: JSON.parse(data.categories),
         status: 'pending',
       });
       return createResponse('success', 'Create post successfully', post, null);

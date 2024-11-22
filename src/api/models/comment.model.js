@@ -29,7 +29,10 @@ const commentSchema = new mongoose.Schema(
     toObject: {
       virtuals: true,
     },
-    timestamps: true,
+    timestamps: {
+      createdAt: 'created_at',
+      updatedAt: 'updated_at',
+    },
   }
 );
 

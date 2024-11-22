@@ -8,7 +8,13 @@ const checkBadRequest = (fieldNames = []) => {
     if (missingFields.length > 0) {
       return HttpResponseHandler.BadRequest(
         res,
-        `Missing required fields: ${missingFields.join(', ')}`
+        {
+          status: 400,
+          title: 'Bad Request',
+          message: `Missing fields: ${missingFields.join(', ')}`,
+          source: 'middleware',
+        },
+        'error'
       );
     }
 
