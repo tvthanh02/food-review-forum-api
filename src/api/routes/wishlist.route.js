@@ -39,11 +39,11 @@ const { checkBadRequest } = require('../middlewares/common.middleware');
  *      - bearerAuth: []
  */
 router.get('/', checkLogin, async (req, res) => {
-  const { data, message, errors, status } =
-    await WishlistController.getWishlistByUserId(req.payload.uid);
+  const { data, message, errors, status, meta } =
+    await WishlistController.getWishlistByUserId(req.payload.uid, req.query);
   if (errors)
     return HttpResponseHandler.InternalServerError(res, errors, status);
-  HttpResponseHandler.Success(res, data, message, status);
+  HttpResponseHandler.Success(res, data, message, status, meta);
 });
 
 /**

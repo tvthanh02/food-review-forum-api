@@ -2,16 +2,26 @@ const Wishlist = require('../models/wishlist.model');
 const { createResponse } = require('../helpers');
 
 class WishlistController {
-  static async getWishlistByUserId(userId) {
+  static async getWishlistByUserId(userId, queries) {
+    const { page = 1, limit = 20 } = queries;
+
     try {
-      const wishlist = await Wishlist.find({ user_id: userId })
+      const wishlists = await Wishlist.find({ user_id: userId })
         .populate('post_info')
+        .sort({ created_at: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
         .exec();
       return createResponse(
         'success',
         'get user wishlist successfully',
-        wishlist?.map((item) => item.post_info) ?? [],
-        null
+        wishlists?.map((item) => item.post_info) ?? [],
+        null,
+        {
+          total: wishlists?.length ?? 0,
+          currentPage: +page,
+          totalPages: Math.ceil(wishlists?.length / limit) ?? 0,
+        }
       );
     } catch (error) {
       return createResponse('error', null, null, {

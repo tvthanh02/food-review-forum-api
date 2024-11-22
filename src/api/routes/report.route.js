@@ -71,10 +71,10 @@ const HttpResponseHandler = require('../helpers/response-handler.helper');
  *      - bearerAuth: []
  */
 router.get('/', checkLogin, isAdmin, async (req, res) => {
-  const { data, message, errors, status } =
+  const { data, message, errors, status, meta } =
     await ReportController.getAllReports(req.query);
   if (errors) return HttpResponseHandler.BadRequest(res, errors, status);
-  return HttpResponseHandler.Success(res, data, message, status);
+  return HttpResponseHandler.Success(res, data, message, status, meta);
 });
 
 /**
