@@ -22,6 +22,7 @@ class PostController {
     ]);
     try {
       const posts = await Post.find(queriesSearch)
+        .populate('user_id', 'user_name avatar')
         .sort({ created_at: -1 })
         .skip((page - 1) * limit)
         .limit(limit)
@@ -49,7 +50,9 @@ class PostController {
 
   static async getDetailPost(postId) {
     try {
-      const data = await Post.findById(postId).exec();
+      const data = await Post.findById(postId)
+        .populate('user_id', 'user_name avatar')
+        .exec();
 
       if (!data)
         return createResponse('error', null, null, {

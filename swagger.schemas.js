@@ -121,8 +121,15 @@
  *         food_name:
  *           type: string
  *         user_id:
- *           type: string
- *           format: ObjectId
+ *           type: object
+ *           properties:
+ *             _id:
+ *               type: string
+ *               format: ObjectId
+ *             user_name:
+ *               type: string
+ *             avatar:
+ *               type: string
  *         province:
  *           type: string
  *         maps:

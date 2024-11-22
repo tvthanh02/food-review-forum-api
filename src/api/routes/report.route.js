@@ -97,7 +97,9 @@ router.get('/', checkLogin, isAdmin, async (req, res) => {
  *              post_id:
  *                type: string
  *              report_type_id:
- *                type: string
+ *                type: array
+ *                items:
+ *                  type: string
  *              note:
  *                type: string
  *    responses:
@@ -130,7 +132,10 @@ router.post(
   checkBadRequest(['post_id', 'report_type_id']),
   async (req, res) => {
     const { data, message, errors, status } =
-      await ReportController.createReport(req.body);
+      await ReportController.createReport({
+        ...req.body,
+        uid: req.payload.uid,
+      });
     if (errors) return HttpResponseHandler.BadRequest(res, errors, status);
     return HttpResponseHandler.Success(res, data, message, status);
   }
