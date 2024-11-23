@@ -54,11 +54,12 @@ class ReportController {
     }
   }
   static async createReport(data) {
-    const { post_id, report_type_id, uid } = data;
+    const { post_id, report_type_id, note, uid } = data;
     try {
       const report = await Report.create({
         post_id,
         report_type_id,
+        note: note ? note : '',
         user_id: uid,
       });
       return createResponse(

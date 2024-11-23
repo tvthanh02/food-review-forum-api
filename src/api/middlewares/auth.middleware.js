@@ -88,7 +88,7 @@ const isAdmin = async (req, res, next) => {
   next();
 };
 
-const hasRole = (...allowedRoles) => {
+const hasRole = (allowedRoles) => {
   return (req, res, next) => {
     try {
       const { role } = req.payload;
